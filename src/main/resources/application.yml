@@ -21,5 +21,12 @@ spring:
       printer:
         enabled: true
 
+  # Configuração de Upload de Arquivos
+  servlet:
+    multipart:
+      max-file-size: 100MB # Tamanho máximo por arquivo
+      max-request-size: 100MB # Tamanho máximo da requisição
+      enabled: true
+
 server:
   port: 9999 # Porta da API (alterada para 9999 para evitar conflitos)
