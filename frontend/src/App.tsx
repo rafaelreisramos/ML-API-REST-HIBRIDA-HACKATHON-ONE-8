@@ -81,16 +81,11 @@ function App() {
         setUploadMsg("Enviando...")
 
         try {
-            // NOTA: Endpoint de batch não implementado ainda no Spring Boot
-            // Por enquanto, vamos criar registros um a um via REST
-            setUploadMsg("⚠️ Processamento em lote ainda não disponível na API Spring Boot. Use o simulador individual.")
-
-            /* Implementação futura quando o endpoint estiver pronto:
-            const response = await fetch('/api/churnbatch', {
+            const response = await fetch('/api/churn/batch', {
                 method: 'POST',
                 body: formData,
             })
-            
+
             if (response.ok) {
                 const blob = await response.blob()
                 const url = window.URL.createObjectURL(blob)
@@ -99,11 +94,10 @@ function App() {
                 a.download = `resultado_${file.name}`
                 a.click()
                 setUploadMsg("✅ Processado com sucesso! Download iniciado.")
-                refetchStats()
+                refetch() // Atualiza dashboard
             } else {
                 setUploadMsg("❌ Erro no processamento.")
             }
-            */
         } catch (err) {
             setUploadMsg("❌ Erro de conexão.")
         } finally {

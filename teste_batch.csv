@@ -1,0 +1,6 @@
+clienteId,idade,genero,regiao,valorMensal,tempoAssinaturaMeses,planoAssinatura,metodoPagamento,dispositivoPrincipal,visualizacoesMes,contatosSuporte,avaliacaoPlataforma,avaliacaoConteudoMedia,avaliacaoConteudoUltimoMes,tempoMedioSessaoMin,diasUltimoAcesso
+BATCH-001,25,Feminino,Sul,49.90,6,premium,pix,tv,50,0,4.8,4.9,5.0,80,1
+BATCH-002,45,Masculino,Sudeste,29.90,24,basico,boleto,desktop,10,3,2.5,2.0,2.5,20,7
+BATCH-003,32,Feminino,Norte,39.90,12,padrao,credito,mobile,30,1,4.0,4.2,4.3,45,2
+BATCH-004,28,Outro,Nordeste,49.90,3,premium,pix,tv,60,0,5.0,4.8,4.9,90,1
+BATCH-005,50,Masculino,Centro-Oeste,29.90,36,basico,boleto,desktop,5,5,2.0,1.5,1.8,15,14
