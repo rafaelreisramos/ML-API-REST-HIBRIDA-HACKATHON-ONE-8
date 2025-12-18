@@ -28,6 +28,13 @@ venv/
 *.egg-info/
 .pytest_cache/
 
+# Frontend (React/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.local
+
 # AI Models (GRANDE - não versionar no Git)
 *.joblib
 *.pkl

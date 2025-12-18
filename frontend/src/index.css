@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --- TEMA PADRÃO (LIGHT / CLARO) --- */
+:root {
+  /* Cores de Fundo */
+  --bg-app: #f8fafc;
+  /* Cinza muito claro */
+  --bg-card: #ffffff;
+  /* Branco puro */
+
+  /* Texto */
+  --text-primary: #0f172a;
+  /* Azul marinho quase preto */
+  --text-secondary: #64748b;
+  /* Cinza médio */
+
+  /* Brand */
+  --primary: #6366f1;
+  /* Indigo */
+  --primary-hover: #4f46e5;
+
+  /* Bordas e Detalhes */
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+  /* Status */
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+/* --- TEMA ESCURO (DARK) --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Cores de Fundo */
+    --bg-app: #0f172a;
+    /* Azul noite profundo */
+    --bg-card: #1e293b;
+    /* Azul acinzentado */
+
+    /* Texto */
+    --text-primary: #f1f5f9;
+    /* Branco gelo */
+    --text-secondary: #94a3b8;
+
+    /* Brand */
+    --primary: #818cf8;
+    /* Indigo mais claro para contraste */
+    --primary-hover: #6366f1;
+
+    /* Bordas e Detalhes */
+    --border-color: #334155;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* --- RESET & GLOBAL --- */
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* --- HEADER --- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- CARDS --- */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+/* --- GRID SYSTEM --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* --- STATS KPI --- */
+.stat-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.high-risk {
+  color: var(--danger);
+}
+
+/* --- FORMS & INPUTS --- */
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.625rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-app);
+  /* Input sutilmente diferente do card */
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* --- BUTTONS --- */
+button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- UPLOAD AREA --- */
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-app);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.upload-area:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: rgba(99, 102, 241, 0.05);
+  /* Leve toque da cor primária */
+}
