@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: churn-graphql-api
+
+  # Configuração do MongoDB
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: churn_insights_v2
+      # Se tiver usuario/senha:
+      # username: user
+      # password: password
+
+  # Configuração do GraphQL
+  graphql:
+    graphiql:
+      enabled: true # Habilita o painel visual em http://localhost:8080/graphiql
+      path: /graphiql
+    schema:
+      printer:
+        enabled: true
+
+server:
+  port: 9999 # Porta da API (alterada para 9999 para evitar conflitos)

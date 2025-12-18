@@ -1,0 +1,74 @@
+type Query {
+    # Lista todas as análises
+    listarAnalises: [ChurnData]
+    
+    # Busca apenas os clientes de alto risco
+    listarRiscoAlto: [ChurnData]
+    
+    # Busca por ID da análise
+    buscarPorId(id: ID!): ChurnData
+}
+
+type Mutation {
+    # Simula uma nova análise (recebe dados e salva)
+    registrarAnalise(input: ChurnInput!): ChurnData
+}
+
+# O Objeto de retorno (Output)
+type ChurnData {
+    id: ID
+    dataAnalise: String
+    clienteId: String
+    idade: Int
+    genero: String
+    regiao: String
+    valorMensal: Float
+    tempoAssinaturaMeses: Int
+    diasUltimoAcesso: Int
+    
+    # Novos Campos Legado
+    planoAssinatura: String
+    metodoPagamento: String
+    dispositivoPrincipal: String
+    visualizacoesMes: Int
+    contatosSuporte: Int
+    
+    avaliacaoPlataforma: Float
+    avaliacaoConteudoMedia: Float
+    avaliacaoConteudoUltimoMes: Float
+    tempoMedioSessaoMin: Int
+    previsao: String
+    probabilidade: Float
+    riscoAlto: Boolean
+    modeloUsado: String
+}
+
+# O Objeto de entrada (Input do formulário)
+input ChurnInput {
+    clienteId: String
+    idade: Int
+    genero: String
+    regiao: String
+    valorMensal: Float
+    tempoAssinaturaMeses: Int
+    diasUltimoAcesso: Int
+    
+    # Novos Campos Legado
+    planoAssinatura: String
+    metodoPagamento: String
+    dispositivoPrincipal: String
+    visualizacoesMes: Int
+    contatosSuporte: Int
+    
+    avaliacaoPlataforma: Float
+    
+    # Campos V4
+    avaliacaoConteudoMedia: Float
+    avaliacaoConteudoUltimoMes: Float
+    tempoMedioSessaoMin: Int
+    
+    # Simulação Direta (normalmente viria da IA, mas vamos simular aqui)
+    previsao: String
+    probabilidade: Float
+    riscoAlto: Boolean
+}

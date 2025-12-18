@@ -1,0 +1,66 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+*.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# AI Models (GRANDE - não versionar no Git)
+*.joblib
+*.pkl
+*.h5
+*.pth
+*.onnx
+model_v4_metadata.json
+
+# Maven download (não versionar binário)
+apache-maven-*/
+*.zip
+
+# Generated Context Files (MUITO GRANDES)
+PROJECT_CONTEXT_PDR.txt
+PROJECT_CONTEXT_SUMMARY.txt
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Temporary
+*.tmp
+*.swp
+*~
+
+# Environment variables (se existir)
+.env
+.env.local
+
