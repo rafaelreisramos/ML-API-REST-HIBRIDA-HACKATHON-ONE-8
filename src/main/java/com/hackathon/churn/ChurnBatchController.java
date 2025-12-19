@@ -66,7 +66,8 @@ public class ChurnBatchController {
 
                 // Adicionar ao CSV de saída
                 csvResultado
-                        .append(String.format("%s,%d,%s,%s,%.2f,%d,%s,%s,%s,%d,%d,%.1f,%.1f,%.1f,%d,%d,%s,%.4f,%b,%s\n",
+                        .append(String.format(Locale.US,
+                                "%s,%d,%s,%s,%.2f,%d,%s,%s,%s,%d,%d,%.1f,%.1f,%.1f,%d,%d,%s,%.4f,%b,%s\n",
                                 dados.getClienteId(),
                                 dados.getIdade(),
                                 dados.getGenero(),
