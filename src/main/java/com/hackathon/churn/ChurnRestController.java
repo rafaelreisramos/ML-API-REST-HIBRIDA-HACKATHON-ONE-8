@@ -21,7 +21,7 @@ public class ChurnRestController {
     @GetMapping
     @Operation(summary = "Listar todas as análises", description = "Retorna o histórico completo de previsões.")
     public List<ChurnData> listarTodos() {
-        return repository.findAll();
+        return repository.findByAtivoTrue();
     }
 
     @GetMapping("/{id}")

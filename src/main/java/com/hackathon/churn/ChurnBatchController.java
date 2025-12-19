@@ -127,8 +127,40 @@ public class ChurnBatchController {
         return resultado;
     }
 
+    @Autowired
+    private org.springframework.data.mongodb.core.MongoTemplate mongoTemplate;
+
+    @DeleteMapping("/reset")
+    @Operation(summary = "Arquivar Dashboard (Soft Delete)", description = "Marca todos os registros atuais como inativos e define data de arquivamento. Operação em massa.")
+    public ResponseEntity<Map<String, Object>> arquivarDashboard() {
+
+        long startTime = System.currentTimeMillis();
+
+        // 1. Definir Critério: Ativo = true
+        org.springframework.data.mongodb.core.query.Query query = new org.springframework.data.mongodb.core.query.Query();
+        query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("ativo").is(true));
+
+        // 2. Definir Update: Ativo = false, Data = Agora
+        org.springframework.data.mongodb.core.query.Update update = new org.springframework.data.mongodb.core.query.Update();
+        update.set("ativo", false);
+        update.set("dataArquivamento", java.time.LocalDateTime.now());
+
+        // 3. Executar Bulk Update
+        com.mongodb.client.result.UpdateResult result = mongoTemplate.updateMulti(query, update, ChurnData.class);
+
+        long duration = System.currentTimeMillis() - startTime;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Dashboard arquivado com sucesso.");
+        response.put("adicionadosAoArquivo", result.getModifiedCount());
+        response.put("tempoExecucaoMs", duration);
+
+        return ResponseEntity.ok(response);
+    }
+
     private ChurnData mapearParaChurnData(Map<String, String> map) {
         ChurnData data = new ChurnData();
+        data.setAtivo(true); // Garantir que novos sejam ativos
         data.setClienteId(map.getOrDefault("clienteId", "UNKNOWN"));
         data.setIdade(Integer.parseInt(map.getOrDefault("idade", "30")));
         data.setGenero(map.getOrDefault("genero", "Masculino"));

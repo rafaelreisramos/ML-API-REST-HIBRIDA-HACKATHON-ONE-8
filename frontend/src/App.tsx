@@ -109,8 +109,30 @@ function App() {
         <div className="container">
             <header>
                 <div className="logo">ChurnInsight 🔮</div>
-                <div style={{ marginLeft: 'auto', fontSize: '0.9rem', color: '#94a3b8' }}>
-                    Ambiente: Fase 2 (React + GraphQL + Sandbox)
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                        Ambiente: Fase 2 (React + GraphQL + Sandbox)
+                    </div>
+                    <button
+                        onClick={async () => {
+                            if (!window.confirm("⚠️ ATENÇÃO: Deseja arquivar todos os dados do dashboard? \n\nIsso limpará a visualização atual, mas os dados serão mantidos no histórico do banco.")) return;
+
+                            try {
+                                const res = await fetch('/api/churn/reset', { method: 'DELETE' });
+                                if (res.ok) {
+                                    alert("✅ Dashboard arquivado com sucesso!");
+                                    window.location.reload();
+                                } else {
+                                    alert("❌ Erro ao arquivar.");
+                                }
+                            } catch (e) {
+                                alert("❌ Erro de conexão.");
+                            }
+                        }}
+                        style={{ backgroundColor: '#ef4444', padding: '0.5rem 1rem', fontSize: '0.85rem', width: 'auto' }}
+                    >
+                        🗑️ Arquivar Dashboard
+                    </button>
                 </div>
             </header>
 

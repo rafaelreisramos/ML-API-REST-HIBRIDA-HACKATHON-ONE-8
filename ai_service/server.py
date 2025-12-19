@@ -71,7 +71,7 @@ def predict(input_data: JavaInput):
         raise HTTPException(status_code=500, detail="Modelo offline")
         
     try:
-        data = input_data.dict()
+        data = input_data.model_dump()
         
         # --- Mapper Universal (Java -> Python Snake Case) ---
         mapper = {

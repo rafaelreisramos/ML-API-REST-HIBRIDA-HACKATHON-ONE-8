@@ -16,7 +16,7 @@ public class ChurnController {
 
     @QueryMapping
     public List<ChurnData> listarAnalises() {
-        return repository.findAll();
+        return repository.findByAtivoTrue();
     }
 
     @QueryMapping

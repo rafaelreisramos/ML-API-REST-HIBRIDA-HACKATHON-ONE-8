@@ -15,6 +15,10 @@ public class ChurnData {
 
     private LocalDateTime dataAnalise = LocalDateTime.now();
 
+    // Controle de Arquivamento (Soft Delete)
+    private Boolean ativo = true;
+    private LocalDateTime dataArquivamento;
+
     // Dados do Cliente
     @NotBlank(message = "O ID do cliente é obrigatório")
     private String clienteId;

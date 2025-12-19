@@ -10,4 +10,7 @@ public interface ChurnRepository extends MongoRepository<ChurnData, String> {
 
     // Buscar por ID do cliente original
     List<ChurnData> findByClienteId(String clienteId);
+
+    // Buscar apenas ativos (Dashboard)
+    List<ChurnData> findByAtivoTrue();
 }
