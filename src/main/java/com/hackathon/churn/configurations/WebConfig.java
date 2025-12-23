@@ -1,4 +1,4 @@
-package com.hackathon.churn;
+package com.hackathon.churn.configurations;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
