@@ -698,7 +698,7 @@ taskkill /F /IM java.exe
 ### Curto Prazo (1-2 semanas)
 
 1. **Autenticação JWT**
-   - Spring Security
+   - Spring com.hackathon.churn.security
    - Login/Register endpoints
    - Token-based auth
 

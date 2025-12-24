@@ -1,5 +1,7 @@
-package com.hackathon.churn;
+package com.hackathon.churn.controller;
 
+import com.hackathon.churn.ChurnData;
+import com.hackathon.churn.Repository.ChurnRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;

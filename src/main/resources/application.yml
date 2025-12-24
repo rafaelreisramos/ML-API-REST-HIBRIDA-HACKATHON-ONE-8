@@ -8,7 +8,7 @@ spring:
       host: localhost
       port: 27017
       database: churn_insights_v2
-      # Se tiver usuario/senha:
+      # Se tiver com.hackathon.churn.usuario/senha:
       # username: user
       # password: password
 

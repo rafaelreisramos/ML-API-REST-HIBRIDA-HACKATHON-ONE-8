@@ -1,5 +1,7 @@
-package com.hackathon.churn;
+package com.hackathon.churn.controller;
 
+import com.hackathon.churn.ChurnData;
+import com.hackathon.churn.Repository.ChurnRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
