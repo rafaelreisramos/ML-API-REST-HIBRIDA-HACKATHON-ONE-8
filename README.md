@@ -429,7 +429,7 @@ python test_legacy_fields.py
 - ✅ CORS configurado
 - ✅ Sem credenciais hardcoded
 - ✅ Modelos ML fora do Git
-- ⚠️ **Para Produção:** Adicionar JWT/OAuth2
+- ✅ **JWT implementado** com Spring Security
 
 ---
 
