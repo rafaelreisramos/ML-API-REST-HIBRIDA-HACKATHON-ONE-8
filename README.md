@@ -94,6 +94,16 @@ Criar uma API robusta e escalável para análise preditiva de churn de clientes 
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### 🛠️ Service Layer
+
+A lógica de negócio está centralizada em Services:
+
+| Service | Responsabilidade |
+|---------|------------------|
+| `ChurnService` | CRUD + chamada à IA para previsões |
+| `ChurnBatchService` | Processamento CSV + paralelo + bulk insert |
+| `SystemService` | Health check + estatísticas agregadas |
+
 ---
 
 ## 🚀 Quick Start
@@ -298,25 +308,35 @@ mutation {
 
 ## 🧪 Testes Automatizados
 
+### Testes Unitários (Java + Mockito)
+
 ```bash
-# Teste End-to-End
+mvn test
+```
+
+| Classe de Teste | Testes | Cobertura |
+|-----------------|--------|-----------|
+| `ChurnServiceTest` | 5 | CRUD + IA |
+| `ChurnBatchServiceTest` | 5 | CSV + Batch |
+| `SystemServiceTest` | 7 | Health + Stats |
+| **Total** | **17** | **100% ✅** |
+
+### Testes End-to-End (Python)
+
+```bash
 python test_api_e2e.py
-
-# Teste de Validação
 python test_validation.py
-
-# Teste de Compatibilidade
 python test_legacy_fields.py
 ```
 
 **Resultados:**
 
-- ✅ 100% de sucesso (5/5 testes)
+- ✅ 17 testes unitários Java (Mockito)
+- ✅ 5 testes E2E Python
 - ✅ GraphQL Mutation + Query
 - ✅ REST POST + GET
 - ✅ Bean Validation
-- ✅ Integração MongoDB
-- ✅ Integração ML
+- ✅ Integração MongoDB + ML
 
 ---
 
