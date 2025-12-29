@@ -435,7 +435,7 @@ python test_legacy_fields.py
 
 ## 📈 Roadmap Futuro
 
-- [ ] Autenticação JWT
+- [x] Autenticação JWT
 - [ ] Rate Limiting
 - [ ] Cache Redis
 - [ ] CI/CD Pipeline
