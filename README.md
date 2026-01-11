@@ -133,12 +133,18 @@ docker-compose up -d
 ### 3. Run API
 
 ```bash
-# Windows PowerShell
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.17.10-hotspot"
-.\apache-maven-3.9.6\bin\mvn.cmd spring-boot:run
+# Windows (Automático - Baixa Maven + Configura JWT)
+.\run_api.bat
 
 # Linux/Mac
+export JWT_TOKEN="seu_token_secreto_dev"
 ./mvnw spring-boot:run
+```
+
+### 📜 Histórico de Mudanças
+
+Veja o [CHANGELOG.md](./CHANGELOG.md) para detalhes das últimas atualizações e correções.
+
 ```
 
 ### 4. Run Frontend
