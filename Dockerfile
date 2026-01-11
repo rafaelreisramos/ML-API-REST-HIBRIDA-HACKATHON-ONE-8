@@ -15,6 +15,9 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
+# Token padrão para garantir inicialização sem falhas
+ENV JWT_TOKEN="hackathon_build_token_default"
+
 # Copiar o JAR gerado no estágio anterior
 COPY --from=build /app/target/*.jar app.jar
 

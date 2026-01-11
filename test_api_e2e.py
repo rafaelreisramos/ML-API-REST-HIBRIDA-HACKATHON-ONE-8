@@ -40,6 +40,11 @@ def test_flow():
         avaliacaoConteudoMedia: 5.0,
         avaliacaoConteudoUltimoMes: 5.0,
         tempoMedioSessaoMin: 120,
+        planoAssinatura: "Premium",
+        metodoPagamento: "Credito",
+        dispositivoPrincipal: "Desktop",
+        visualizacoesMes: 50,
+        contatosSuporte: 1,
         previsao: "Fiel",
         probabilidade: 0.00,
         riscoAlto: false
