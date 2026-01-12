@@ -32,19 +32,58 @@ class MockChurnModelV4:
         p = 0.8 if df.iloc[0].get('avaliacao_conteudo_media', 5) < 3 else 0.2
         return [[1-p, p]]
 
+# --- Auto-Healing Logic ---
+def rebuild_model_if_needed():
+    print("⚠️ [AI SERVICE] Tentando reconstruir modelo a partir dos CSVs...")
+    try:
+        x_path = os.path.join(MODEL_DIR, 'X_train.csv')
+        y_path = os.path.join(MODEL_DIR, 'y_train.csv')
+        
+        if not os.path.exists(x_path):
+            print("❌ CSVs de treino não encontrados. Impossível reconstruir.")
+            return False
+
+        print(f"📊 Carregando dados de treino: {x_path}")
+        X = pd.read_csv(x_path)
+        y = pd.read_csv(y_path)
+        
+        if y.shape[1] > 1: y = y.iloc[:, 0] # Flatten se necessário
+
+        print("🧠 Treinando RandomForest (n=100)...")
+        from sklearn.ensemble import RandomForestClassifier
+        # Configuração similar ao G8
+        clf = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=15, n_jobs=-1)
+        clf.fit(X, y)
+        
+        print(f"💾 Salvando modelo recuperado em: {MODEL_PATH}")
+        joblib.dump(clf, MODEL_PATH)
+        return True
+    except Exception as e:
+        print(f"🔥 Falha na reconstrução: {e}")
+        return False
+
+# Carregamento Crítico com Fallback de Rebuild
 try:
+    print(f"🔄 Tentando carregar modelo: {MODEL_PATH}")
     model = joblib.load(MODEL_PATH)
-    print(f"✅ [AI SERVICE] Modelo G8 carregado: {MODEL_PATH}")
-    
+    print(f"✅ [AI SERVICE] Modelo G8 carregado com SUCESSO.")
+except Exception as e:
+    print(f"⚠️ [AI SERVICE] Falha ao carregar modelo existente: {e}")
+    if rebuild_model_if_needed():
+        model = joblib.load(MODEL_PATH)
+        print("✅ [AI SERVICE] Modelo reconstruído e carregado!")
+    else:
+        print("🔥 [AI SERVICE] FALHA FATAL: Sem modelo, sem csvs, sem mock.")
+        raise e
+
+# Tentar carregar threshold
+try:
     with open(THRESHOLD_PATH, 'r') as f:
         threshold_otimo = float(f.read().strip())
-    print(f"✅ [AI SERVICE] Threshold Otimizado: {threshold_otimo}")
-    
-except Exception as e:
-    print(f"❌ [AI SERVICE] FALHA CRÍTICA ao carregar modelo G8: {e}")
-    # Fallback apenas para não crashar o container, mas a predição será dummy
-    model = MockChurnModelV4()
+    print(f"✅ [AI SERVICE] Threshold carregado: {threshold_otimo}")
+except:
     threshold_otimo = 0.5
+    print("⚠️ Usando threshold padrão 0.5")
 
 # Modelo de Entrada Atualizado (Compatível com ChurnData.java)
 class JavaInput(BaseModel):
