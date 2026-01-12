@@ -454,7 +454,7 @@ python test_legacy_fields.py
 ## 👥 Equipe
 
 **Hackathon ONE 8 - Alura**  
-Desenvolvido por: [@Araken13](https://github.com/Araken13)
+
 
 ---
 
