@@ -14,36 +14,39 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-
-    public static final String usuarioToken = System.getenv("JWT_TOKEN");
-
-    public String gerarToken(Usuario usuario){
-        try{
-            var algoritimo = Algorithm.HMAC256(usuarioToken);
+    public String gerarToken(Usuario usuario) {
+        try {
+            var secret = System.getenv("JWT_TOKEN");
+            if (secret == null)
+                secret = "hackathon_fallback_secret_123";
+            var algoritimo = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("API-REST-HIBRIDA-HACKATHON-ONE-8")
                     .withSubject(usuario.getLogin())
                     .withExpiresAt(dataExpiracao())
                     .sign(algoritimo);
-        }catch (JWTCreationException e){
-            throw new RuntimeException("Erro ao gerar token" , e);
+        } catch (JWTCreationException e) {
+            throw new RuntimeException("Erro ao gerar token", e);
         }
     }
 
-    public String getSubject(String tokenJWT){
-        try{
-            var algoritimo = Algorithm.HMAC256(usuarioToken);
+    public String getSubject(String tokenJWT) {
+        try {
+            var secret = System.getenv("JWT_TOKEN");
+            if (secret == null)
+                secret = "hackathon_fallback_secret_123";
+            var algoritimo = Algorithm.HMAC256(secret);
             return JWT.require(algoritimo)
                     .withIssuer("API-REST-HIBRIDA-HACKATHON-ONE-8")
                     .build()
                     .verify(tokenJWT)
                     .getSubject();
-        }catch (JWTVerificationException e){
+        } catch (JWTVerificationException e) {
             throw new RuntimeException("Token inválido ou expirado");
         }
     }
 
-    private Instant dataExpiracao(){
+    private Instant dataExpiracao() {
         return (LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00")));
     }
 

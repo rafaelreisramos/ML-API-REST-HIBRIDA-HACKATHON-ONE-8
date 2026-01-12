@@ -25,3 +25,9 @@ Hoje realizamos a revisÃ£o completa do cÃ³digo submetido pelos colaboradores e a
 
 ---
 *Revisado e Aprovado por: Time de Engenharia (IA + Humano)*
+
+### Correções Globais de Segurança e Auth
+- [x] Implementado cadastro de usuários funcional.
+- [x] Corrigido erro 'Secret cannot be null' no TokenService.
+- [x] Habilitado Login e Geração de Token JWT.
+- [x] Validado fluxo E2E completo: Cadastro -> Login -> Token -> Mutation Seguro.

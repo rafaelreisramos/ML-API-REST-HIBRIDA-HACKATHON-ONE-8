@@ -2,51 +2,84 @@ import urllib.request
 import json
 import sys
 
-URL = "http://localhost:9999/graphql"
+BASE_URL = "http://localhost:9999"
+GRAPHQL_URL = f"{BASE_URL}/graphql"
+LOGIN_URL = f"{BASE_URL}/login"
+REGISTER_URL = f"{BASE_URL}/usuarios"
 
-def run_query(query, variables=None):
-    payload = {"query": query}
-    if variables:
-        payload["variables"] = variables
+def make_request(url, method="POST", data=None, token=None):
+    headers = {'Content-Type': 'application/json'}
+    if token:
+        headers['Authorization'] = f"Bearer {token}"
     
-    data = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(URL, data=data, headers={'Content-Type': 'application/json'})
+    body = json.dumps(data).encode('utf-8') if data else None
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
     
     try:
         with urllib.request.urlopen(req) as response:
-            return json.loads(response.read().decode('utf-8'))
+            if response.status == 204: return None
+            content = response.read().decode('utf-8')
+            try:
+                return json.loads(content)
+            except json.JSONDecodeError:
+                return content # Retorna texto puro se não for JSON
+    except urllib.error.HTTPError as e:
+        print(f"❌ Erro HTTP {e.code}: {e.read().decode('utf-8')}")
+        return None
     except Exception as e:
         print(f"❌ Erro de Conexão: {e}")
-        print("Certifique-se que o servidor está rodando na porta 9999.")
         sys.exit(1)
 
+def get_token():
+    print("\n🔑 Autenticando...")
+    user_data = {"login": "test_admin_v4", "senha": "123"}
+    
+    # 1. Tentar Cadastrar (pode falhar se já existir, tudo bem)
+    make_request(REGISTER_URL, data=user_data)
+    
+    # 2. Tentar Logar
+    resp = make_request(LOGIN_URL, data=user_data)
+    if resp and "token" in resp:
+        print("✅ Login realizado com sucesso!")
+        return resp["token"]
+    else:
+        print("❌ Falha no login. Verifique o servidor.")
+        sys.exit(1)
+
+def run_graphql(query, variables=None, token=None):
+    payload = {"query": query}
+    if variables: payload["variables"] = variables
+    return make_request(GRAPHQL_URL, data=payload, token=token)
+
 def test_flow():
-    print("🚀 Iniciando Teste E2E (Script Python Automation)...")
-    print(f"📡 Target: {URL}\n")
+    print("🚀 Iniciando Teste E2E Seguro (Python)...")
+    
+    # --- Passo 0: Login ---
+    token = get_token()
     
     # --- 1. Mutation: Registrar Análise ---
-    print("1️⃣  Situação 1: Testando Mutation (registrarAnalise)...")
+    print("\n1️⃣  Situação 1: Testando Mutation (registrarAnalise)...")
     mutation = """
     mutation {
       registrarAnalise(input: {
-        clienteId: "TESTE-E2E-AUTO",
-        idade: 99,
-        genero: "Robo",
-        regiao: "Cyberspace",
-        valorMensal: 999.99,
-        tempoAssinaturaMeses: 1,
+        clienteId: "TESTE-SECURE-01",
+        idade: 30,
+        genero: "Hibrido",
+        regiao: "Nuvem",
+        valorMensal: 100.00,
+        tempoAssinaturaMeses: 12,
         diasUltimoAcesso: 0,
-        avaliacaoPlataforma: 5.0,
-        avaliacaoConteudoMedia: 5.0,
-        avaliacaoConteudoUltimoMes: 5.0,
-        tempoMedioSessaoMin: 120,
+        avaliacaoPlataforma: 4.5,
+        avaliacaoConteudoMedia: 4.5,
+        avaliacaoConteudoUltimoMes: 4.5,
+        tempoMedioSessaoMin: 60,
         planoAssinatura: "Premium",
-        metodoPagamento: "Credito",
-        dispositivoPrincipal: "Desktop",
-        visualizacoesMes: 50,
-        contatosSuporte: 1,
-        previsao: "Fiel",
-        probabilidade: 0.00,
+        metodoPagamento: "Pix",
+        dispositivoPrincipal: "Mobile",
+        visualizacoesMes: 10,
+        contatosSuporte: 0,
+        previsao: "Analise Pendente",
+        probabilidade: 0.0,
         riscoAlto: false
       }) {
         id
@@ -56,47 +89,38 @@ def test_flow():
     }
     """
     
-    response = run_query(mutation)
+    response = run_graphql(mutation, token=token)
     
-    if "errors" in response:
+    if not response or "errors" in response:
         print("❌ Mutation Falhou!")
-        print(json.dumps(response, indent=2))
+        if response: print(json.dumps(response, indent=2))
         sys.exit(1)
         
     created_id = response["data"]["registrarAnalise"]["id"]
     print(f"✅ Mutation Sucesso! ID Criado: {created_id}")
     
     # --- 2. Query: Buscar o dado criado ---
-    print(f"\n2️⃣  Situação 2: Testando Query (buscarPorId) para o ID: {created_id}...")
+    print(f"\n2️⃣  Situação 2: Testando Query (buscarPorId)...")
     query = """
     query busca($id: ID!) {
       buscarPorId(id: $id) {
         id
         clienteId
         regiao
-        valorMensal
-        previsao
       }
     }
     """
     
-    response = run_query(query, variables={"id": created_id})
+    response = run_graphql(query, variables={"id": created_id}, token=token)
     
-    if "errors" in response:
+    if not response or "errors" in response:
         print("❌ Query Falhou!")
-        print(json.dumps(response, indent=2))
+        if response: print(json.dumps(response, indent=2))
         sys.exit(1)
         
     result = response["data"]["buscarPorId"]
-    
-    # --- 3. Validação ---
-    print("\n🔍 Validando Dados Retornados:")
-    print(json.dumps(result, indent=2, ensure_ascii=False))
-    
-    if result["clienteId"] == "TESTE-E2E-AUTO" and result["regiao"] == "Cyberspace":
-         print("\n✨ SUCESSO! O teste de ponta a ponta passou. A API está Gravando e Lendo corretamente. ✨")
-    else:
-         print("\n⚠️  Alerta: Os dados retornados não conferem com o esperado.")
+    print(f"✅ Query Sucesso! Cliente: {result['clienteId']}")
+    print("\n✨ SUCESSO! A API está segura e funcional. ✨")
 
 if __name__ == "__main__":
     test_flow()

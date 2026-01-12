@@ -24,25 +24,33 @@ public class SecurityFilter extends OncePerRequestFilter {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         var tokenJWT = recuperarToken(request);
 
-        if(tokenJWT != null){
-            var subject = tokenService.getSubject(tokenJWT);
-            var usuario = usuarioRepository.findByLogin(subject);
+        if (tokenJWT != null) {
+            try {
+                var subject = tokenService.getSubject(tokenJWT);
+                var usuario = usuarioRepository.findByLogin(subject);
 
-            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (usuario != null) {
+                    var authentication = new UsernamePasswordAuthenticationToken(usuario, null,
+                            usuario.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (Exception e) {
+                // Token inválido - segue fluxo
+            }
         }
 
         filterChain.doFilter(request, response);
 
     }
 
-    private String recuperarToken(HttpServletRequest request){
+    private String recuperarToken(HttpServletRequest request) {
         var autorizationHeader = request.getHeader("Authorization");
-        if(autorizationHeader != null){
-            return autorizationHeader.replace("Bearer " , "");
+        if (autorizationHeader != null) {
+            return autorizationHeader.replace("Bearer ", "");
         }
         return null;
     }
