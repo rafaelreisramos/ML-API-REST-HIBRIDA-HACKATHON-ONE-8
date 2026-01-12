@@ -18,31 +18,28 @@ except ImportError:
 
 app = FastAPI(title="AI Churn Service V4", description="Microserviço Python para inferência de modelo V4")
 
-# Tentar carregar V4, senão V1
-MODEL_PATH = 'churn_model_v4.joblib'
-if not os.path.exists(MODEL_PATH):
-    MODEL_PATH = 'churn_model.joblib'
-
-class MockChurnModelV4:
-    def predict(self, df):
-        return [1] if df.iloc[0].get('avaliacao_conteudo_media', 5) < 3 else [0]
-    
-    def predict_proba(self, df):
-        p = 0.8 if df.iloc[0].get('avaliacao_conteudo_media', 5) < 3 else 0.2
-        return [[1-p, p]]
+# Tentar carregar Modelo G8 (Prioridade Total)
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
+MODEL_PATH = os.path.join(MODEL_DIR, 'modelo_churn.joblib')
+THRESHOLD_PATH = os.path.join(MODEL_DIR, 'threshold_otimo.txt')
 
 try:
     model = joblib.load(MODEL_PATH)
-    print(f"✅ [AI SERVICE] Modelo '{MODEL_PATH}' carregado com sucesso!")
+    print(f"✅ [AI SERVICE] Modelo G8 carregado: {MODEL_PATH}")
+    
+    with open(THRESHOLD_PATH, 'r') as f:
+        threshold_otimo = float(f.read().strip())
+    print(f"✅ [AI SERVICE] Threshold Otimizado: {threshold_otimo}")
+    
 except Exception as e:
-    print(f"❌ [AI SERVICE] Erro ao carregar modelo '{MODEL_PATH}': {e}")
-    print("⚠️ [AI SERVICE] Ativando Mock Model V4 de Emergência")
+    print(f"❌ [AI SERVICE] FALHA CRÍTICA ao carregar modelo G8: {e}")
+    # Fallback apenas para não crashar o container, mas a predição será dummy
     model = MockChurnModelV4()
-    MODEL_PATH = "MOCK-V4-EMERGENCY"
+    threshold_otimo = 0.5
 
-# Modelo de Entrada (Superset V1 + V4)
+# Modelo de Entrada Atualizado (Compatível com ChurnData.java)
 class JavaInput(BaseModel):
-    # Campos V1 (Legado)
+    # Campos V1 (Legado mantido por segurança)
     idade: int
     tempoAssinaturaMeses: int
     planoAssinatura: str
@@ -61,9 +58,10 @@ class JavaInput(BaseModel):
     regiao: str
     genero: str
     
-    # Novos campos potenciais V4 (opcionais por enquanto)
-    tipoContrato: str | None = "Mensal"
-    categoriaFavorita: str | None = "Geral"
+    # Novos campos Obrigatórios V8 (Hackathon G8)
+    tipoContrato: str
+    categoriaFavorita: str
+    acessibilidade: int # 0 ou 1
 
 @app.post("/predict")
 def predict(input_data: JavaInput):
@@ -89,6 +87,7 @@ def predict(input_data: JavaInput):
             "avaliacaoPlataforma": "avaliacao_plataforma",
             "tipoContrato": "tipo_contrato",
             "categoriaFavorita": "categoria_favorita",
+            "acessibilidade": "acessibilidade",
             "regiao": "regiao",
             "genero": "genero",
             "idade": "idade"
@@ -101,36 +100,25 @@ def predict(input_data: JavaInput):
                 
         df = pd.DataFrame([row])
         
-        # --- Preprocessamento Dinâmico ---
-        # Se for V4, provavelmente o pipeline já cuida do encoding.
-        # Se for V1, precisamos do preprocess manual.
-        # Vamos tentar inferir.
+        # --- Preprocessamento Híbrido V8 ---
+        from processing import preprocess_input
+        df = preprocess_input(df)
         
-        is_pipeline = hasattr(model, 'steps') or hasattr(model, 'named_steps')
-        
-        if not is_pipeline and "model_v4" not in MODEL_PATH:
-             # Fallback para V1 manual
-             from processing import preprocess_input
-             df = preprocess_input(df)
-        
-        # Garantir colunas faltantes com default 0/"" se o modelo exigir (via try/catch no predict)
-             
         # Previsão
         probabilidade = 0.0
         prediction = 0
         
         if hasattr(model, 'predict_proba'):
             try:
+                # O modelo espera features selecionadas pelo RFE (já feito no preprocess)
                 probs = model.predict_proba(df)
                 probabilidade = float(probs[0][1])
-                prediction = 1 if probabilidade > 0.5 else 0 # Threshold padrão
+                
+                # Decisão usando Threshold Otimizado (G8)
+                prediction = 1 if probabilidade > threshold_otimo else 0
+                
             except ValueError as ve:
-                # Tentar one-hot encoding manual de emergencia se falhar (caso não seja pipeline)
-                if "could not convert string to float" in str(ve):
-                    print("⚠️ Erro de encoding. Tentando dummification simples...")
-                    df = pd.get_dummies(df)
-                    # Realign columns... (complexo para fazer on-the-fly)
-                    raise ve
+                print(f"❌ Erro de predição: {ve}")
                 raise ve
         else:
             prediction = model.predict(df)[0]
@@ -138,9 +126,9 @@ def predict(input_data: JavaInput):
             
         return {
             "previsao": "Vai cancelar" if int(prediction) == 1 else "Vai continuar",
-            "probabilidade": probabilidade,
-            "riscoAlto": bool(probabilidade > 0.6),
-            "modeloUsado": f"Python AI Service ({MODEL_PATH})"
+            "probabilidade": round(probabilidade, 4),
+            "riscoAlto": bool(probabilidade > 0.6), # Regra de negócio extra
+            "modeloUsado": f"RandomForest G8 (Threshold: {threshold_otimo})"
         }
         
     except Exception as e:

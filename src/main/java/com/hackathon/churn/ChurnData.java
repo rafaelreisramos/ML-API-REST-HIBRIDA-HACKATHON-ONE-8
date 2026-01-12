@@ -58,6 +58,18 @@ public class ChurnData {
     @Min(value = 0)
     private Integer contatosSuporte;
 
+    // --- Novos Campos V8 (Integração Hackathon G8) ---
+    @NotBlank(message = "O tipo de contrato é obrigatório")
+    private String tipoContrato; // "Mensal", "Anual"
+
+    @NotBlank(message = "A categoria favorita é obrigatória")
+    private String categoriaFavorita; // "Filmes", "Séries", etc.
+
+    @Min(value = 0, message = "Acessibilidade deve ser 0 ou 1")
+    @Max(value = 1, message = "Acessibilidade deve ser 0 ou 1")
+    private Integer acessibilidade; // 0 ou 1
+    // ------------------------------------------------
+
     // ----------------------------------------
 
     @Min(value = 0, message = "A nota mínima é 0")
