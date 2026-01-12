@@ -23,6 +23,15 @@ MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
 MODEL_PATH = os.path.join(MODEL_DIR, 'modelo_churn.joblib')
 THRESHOLD_PATH = os.path.join(MODEL_DIR, 'threshold_otimo.txt')
 
+# Mock de Emergência
+class MockChurnModelV4:
+    def predict(self, df):
+        return [1] if df.iloc[0].get('avaliacao_conteudo_media', 5) < 3 else [0]
+    
+    def predict_proba(self, df):
+        p = 0.8 if df.iloc[0].get('avaliacao_conteudo_media', 5) < 3 else 0.2
+        return [[1-p, p]]
+
 try:
     model = joblib.load(MODEL_PATH)
     print(f"✅ [AI SERVICE] Modelo G8 carregado: {MODEL_PATH}")

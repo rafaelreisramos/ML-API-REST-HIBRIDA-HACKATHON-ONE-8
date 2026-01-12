@@ -1,5 +1,25 @@
 # Histórico de Mudanças (Changelog)
 
+## [2026-01-12] - Integração do Modelo V8 + E2E Cirúrgico
+
+Integração completa do modelo de machine learning `hackathon_g8_one` (V8) com pipeline de pré-processamento avançado.
+
+### 🤖 AI Service (Python)
+
+* **Modelo V8:** Implantação de `modelo_churn.joblib` com 100 árvores (Random Forest).
+* **Pipeline RFE:** Seleção automática de features e cálculo de variáveis derivadas (`engajamento_score`, `risco_score`).
+* **Estabilidade:** Fallback inteligente para Mock Model em caso de incompatibilidade de versão.
+
+### ☕ Backend API (Java/GraphQL)
+
+* **Novos Campos:** Adicionados `tipoContrato`, `categoriaFavorita` e `acessibilidade` ao Schema e Entidade.
+* **Validação:** Schema GraphQL sincronizado com requisitos do novo modelo.
+
+### ✅ Testes & DevOps
+
+* **E2E:** Teste end-to-end `test_api_e2e.py` atualizado para validar fluxo completo com novo payload.
+* **Infra:** Dockerfile otimizado para incluir artefatos de IA.
+
 ## [2026-01-12] - Automação e Demonstração via Jupyter
 
 Adicionada camada de orquestração via Notebooks para facilitar apresentações e execução "One-Click".
@@ -21,6 +41,7 @@ Revisão completa do código e ajustes na infraestrutura.
 
 ### 🐛 Fixes
 
-- [x] Cadastro e Login funcionais.
+* [x] Cadastro e Login funcionais.
+
 * [x] Erro 'Secret cannot be null' corrigido.
 * [x] Fluxo de Mutation Seguro validado.

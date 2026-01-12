@@ -33,6 +33,10 @@ type ChurnData {
     visualizacoesMes: Int
     contatosSuporte: Int
     
+    tipoContrato: String
+    categoriaFavorita: String
+    acessibilidade: Int
+    
     avaliacaoPlataforma: Float
     avaliacaoConteudoMedia: Float
     avaliacaoConteudoUltimoMes: Float
@@ -59,6 +63,10 @@ input ChurnInput {
     dispositivoPrincipal: String
     visualizacoesMes: Int
     contatosSuporte: Int
+
+    tipoContrato: String
+    categoriaFavorita: String
+    acessibilidade: Int
     
     avaliacaoPlataforma: Float
     

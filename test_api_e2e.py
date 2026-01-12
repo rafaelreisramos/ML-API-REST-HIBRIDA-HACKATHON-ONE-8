@@ -78,6 +78,9 @@ def test_flow():
         dispositivoPrincipal: "Mobile",
         visualizacoesMes: 10,
         contatosSuporte: 0,
+        tipoContrato: "MENSAL",
+        categoriaFavorita: "DOCUMENTÁRIOS",
+        acessibilidade: 0,
         previsao: "Analise Pendente",
         probabilidade: 0.0,
         riscoAlto: false
