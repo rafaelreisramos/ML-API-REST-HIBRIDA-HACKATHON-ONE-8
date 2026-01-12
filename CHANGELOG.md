@@ -19,6 +19,8 @@ Integração completa do modelo de machine learning `hackathon_g8_one` (V8) com 
 
 * **E2E:** Teste end-to-end `test_api_e2e.py` atualizado para validar fluxo completo com novo payload.
 * **Infra:** Dockerfile otimizado para incluir artefatos de IA.
+* **Batch Processing:** Correção no parser CSV (`ChurnBatchService`) para processar novos campos e garantir previsões em lote.
+* **Auto-Healing:** AI Service retreina o modelo automaticamente em tempo de execução se o binário estiver corrompido.
 
 ## [2026-01-12] - Automação e Demonstração via Jupyter
 

@@ -39,6 +39,12 @@ def test_legacy_fields():
         dispositivoPrincipal: "Smart TV",
         visualizacoesMes: 50,
         contatosSuporte: 0,
+        
+        # Novos campos V8
+        tipoContrato: "MENSAL",
+        categoriaFavorita: "FILMES",
+        acessibilidade: 0,
+        
         # -------------------------------
         
         avaliacaoPlataforma: 4.5,

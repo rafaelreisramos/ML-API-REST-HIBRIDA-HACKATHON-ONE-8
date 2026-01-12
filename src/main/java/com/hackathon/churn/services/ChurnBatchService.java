@@ -133,11 +133,11 @@ public class ChurnBatchService {
     public String gerarCSV(List<ChurnData> resultados) {
         StringBuilder csv = new StringBuilder();
         csv.append(
-                "clienteId,idade,genero,regiao,valorMensal,tempoAssinaturaMeses,planoAssinatura,metodoPagamento,dispositivoPrincipal,visualizacoesMes,contatosSuporte,avaliacaoPlataforma,avaliacaoConteudoMedia,avaliacaoConteudoUltimoMes,tempoMedioSessaoMin,diasUltimoAcesso,previsao,probabilidade,riscoAlto,modeloUsado\n");
+                "clienteId,idade,genero,regiao,valorMensal,tempoAssinaturaMeses,planoAssinatura,metodoPagamento,dispositivoPrincipal,visualizacoesMes,contatosSuporte,avaliacaoPlataforma,avaliacaoConteudoMedia,avaliacaoConteudoUltimoMes,tempoMedioSessaoMin,diasUltimoAcesso,tipoContrato,categoriaFavorita,acessibilidade,previsao,probabilidade,riscoAlto,modeloUsado\n");
 
         for (ChurnData dados : resultados) {
             csv.append(String.format(Locale.US,
-                    "%s,%d,%s,%s,%.2f,%d,%s,%s,%s,%d,%d,%.1f,%.1f,%.1f,%d,%d,%s,%.4f,%b,%s\n",
+                    "%s,%d,%s,%s,%.2f,%d,%s,%s,%s,%d,%d,%.1f,%.1f,%.1f,%d,%d,%s,%s,%d,%s,%.4f,%b,%s\n",
                     dados.getClienteId(),
                     dados.getIdade(),
                     dados.getGenero(),
@@ -154,6 +154,11 @@ public class ChurnBatchService {
                     dados.getAvaliacaoConteudoUltimoMes(),
                     dados.getTempoMedioSessaoMin(),
                     dados.getDiasUltimoAcesso(),
+                    // Novos
+                    dados.getTipoContrato(),
+                    dados.getCategoriaFavorita(),
+                    dados.getAcessibilidade(),
+                    // Outputs
                     dados.getPrevisao(),
                     dados.getProbabilidade(),
                     dados.getRiscoAlto(),
@@ -214,6 +219,12 @@ public class ChurnBatchService {
         data.setAvaliacaoConteudoUltimoMes(Double.parseDouble(map.getOrDefault("avaliacaoConteudoUltimoMes", "4.0")));
         data.setTempoMedioSessaoMin(Integer.parseInt(map.getOrDefault("tempoMedioSessaoMin", "45")));
         data.setDiasUltimoAcesso(Integer.parseInt(map.getOrDefault("diasUltimoAcesso", "1")));
+
+        // Novos Campos V8
+        data.setTipoContrato(map.getOrDefault("tipoContrato", "MENSAL"));
+        data.setCategoriaFavorita(map.getOrDefault("categoriaFavorita", "FILMES"));
+        data.setAcessibilidade(Integer.parseInt(map.getOrDefault("acessibilidade", "0")));
+
         return data;
     }
 }

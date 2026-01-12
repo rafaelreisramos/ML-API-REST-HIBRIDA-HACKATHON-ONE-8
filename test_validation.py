@@ -39,7 +39,12 @@ def test_validation():
         diasUltimoAcesso: 0,
         avaliacaoPlataforma: 6.0, # (Deve falhar @Max 5)
         
-        # Novos campos
+        # Novos campos V8 Obrigatórios
+        tipoContrato: "MENSAL",
+        categoriaFavorita: "GERAL",
+        acessibilidade: 0,
+        
+        # Novos campos V4
         avaliacaoConteudoMedia: 0.0,
         avaliacaoConteudoUltimoMes: 0.0,
         tempoMedioSessaoMin: 0,
