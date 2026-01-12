@@ -1,8 +1,39 @@
 import requests
 import time
 
+def get_token():
+    """Autentica e retorna o token JWT"""
+    print("🔑 Autenticando...")
+    login_url = "http://localhost:9999/login"
+    register_url = "http://localhost:9999/usuarios"
+    user_data = {"login": "test_batch_user", "senha": "123"}
+    
+    # Tentar cadastrar (pode falhar se já existir)
+    try:
+        requests.post(register_url, json=user_data)
+    except:
+        pass
+    
+    # Fazer login
+    response = requests.post(login_url, json=user_data)
+    if response.status_code == 200:
+        token = response.json().get("token")
+        print("✅ Login realizado com sucesso!")
+        return token
+    else:
+        print("❌ Falha no login")
+        return None
+
 print("🚀 Iniciando teste de processamento em lote (50.000 clientes)...")
 print("=" * 70)
+
+# Autenticação
+token = get_token()
+if not token:
+    print("❌ Não foi possível autenticar. Abortando teste.")
+    exit(1)
+
+print()
 
 # Configuração
 url = "http://localhost:9999/api/churn/batch"
@@ -12,6 +43,7 @@ arquivo = "simulacao_futura_50000_clientes (1).csv"
 print(f"📂 Abrindo arquivo: {arquivo}")
 with open(arquivo, 'rb') as f:
     files = {'file': (arquivo, f, 'text/csv')}
+    headers = {'Authorization': f'Bearer {token}'}
     
     print(f"📤 Enviando para: {url}")
     print("⏳ Aguardando processamento (pode levar vários minutos)...")
@@ -23,7 +55,8 @@ with open(arquivo, 'rb') as f:
         response = requests.post(
             url, 
             files=files,
-            timeout=600  # 10 minutos
+            headers=headers,
+            timeout=1800  # 30 minutos (aumentado de 10 para 30)
         )
         
         fim = time.time()
@@ -71,8 +104,8 @@ with open(arquivo, 'rb') as f:
             print(f"Response: {response.text[:500]}")
             
     except requests.exceptions.Timeout:
-        print("⏰ TIMEOUT! O processamento excedeu 10 minutos.")
-        print("💡 Considere processar em lotes menores ou aumentar o timeout.")
+        print("⏰ TIMEOUT! O processamento excedeu 30 minutos.")
+        print("💡 Considere usar o endpoint /batch/optimized para melhor performance.")
     except Exception as e:
         print(f"❌ Erro: {e}")
 

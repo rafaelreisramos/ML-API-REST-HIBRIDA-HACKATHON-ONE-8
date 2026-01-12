@@ -1,8 +1,39 @@
 import requests
 import time
 
+def get_token():
+    """Autentica e retorna o token JWT"""
+    print("🔑 Autenticando...")
+    login_url = "http://localhost:9999/login"
+    register_url = "http://localhost:9999/usuarios"
+    user_data = {"login": "test_batch_user", "senha": "123"}
+    
+    # Tentar cadastrar (pode falhar se já existir)
+    try:
+        requests.post(register_url, json=user_data)
+    except:
+        pass
+    
+    # Fazer login
+    response = requests.post(login_url, json=user_data)
+    if response.status_code == 200:
+        token = response.json().get("token")
+        print("✅ Login realizado com sucesso!")
+        return token
+    else:
+        print("❌ Falha no login")
+        return None
+
 print("🚀 Teste de processamento OTIMIZADO (Threading Paralelo + Bulk Insert)")
 print("=" * 80)
+
+# Autenticação
+token = get_token()
+if not token:
+    print("❌ Não foi possível autenticar. Abortando teste.")
+    exit(1)
+
+print()
 
 # Configuração
 url_optimized = "http://localhost:9999/api/churn/batch/optimized"
@@ -12,6 +43,7 @@ arquivo = "teste_batch.csv"  # Começar com arquivo pequeno para validar
 print(f"📂 Abrindo arquivo: {arquivo}")
 with open(arquivo, 'rb') as f:
     files = {'file': (arquivo, f, 'text/csv')}
+    headers = {'Authorization': f'Bearer {token}'}
     
     print(f"📤 Enviando para: {url_optimized}")
     print("⚙️  Configuração do servidor: 20 threads paralelas + bulk insert 1000")
@@ -24,6 +56,7 @@ with open(arquivo, 'rb') as f:
         response = requests.post(
             url_optimized, 
             files=files,
+            headers=headers,
             timeout=120  # 2 minutos
         )
         
