@@ -1,0 +1,24 @@
+INFORMAÇÕES DOS LABEL ENCODERS
+================================================================================
+
+genero:
+  Classes: ['FEMININO', 'MASCULINO', 'NAO_INFORMADO', 'OUTROS', nan]
+
+regiao:
+  Classes: ['CENTRO-OESTE', 'NORDESTE', 'NORTE', 'SUDESTE', 'SUL']
+
+tipo_contrato:
+  Classes: ['ANUAL', 'MENSAL']
+
+metodo_pagamento:
+  Classes: ['BOLETO', 'CARTÃO DE CRÉDITO', 'CRÉDITO RECORRENTE', 'DÉBITO', 'DÉBITO AUTOMÁTICO', 'PIX']
+
+plano_assinatura:
+  Classes: ['BÁSICO', 'PADRÃO', 'PREMIUM']
+
+dispositivo_principal:
+  Classes: ['DESKTOP', 'MOBILE', 'TABLET', 'TV']
+
+categoria_favorita:
+  Classes: ['DOCUMENTÁRIOS', 'ESPORTES', 'FILMES', 'INFANTIL', 'NOVELAS', 'SÉRIES']
+

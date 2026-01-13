@@ -1,0 +1,46 @@
+{
+    "genero": {
+        "FEMININO": 0,
+        "MASCULINO": 1,
+        "NAO_INFORMADO": 2,
+        "OUTROS": 3
+    },
+    "regiao": {
+        "CENTRO-OESTE": 0,
+        "NORDESTE": 1,
+        "NORTE": 2,
+        "SUDESTE": 3,
+        "SUL": 4
+    },
+    "tipo_contrato": {
+        "ANUAL": 0,
+        "MENSAL": 1
+    },
+    "metodo_pagamento": {
+        "BOLETO": 0,
+        "CARTÃO DE CRÉDITO": 1,
+        "CRÉDITO RECORRENTE": 2,
+        "DÉBITO": 3,
+        "DÉBITO AUTOMÁTICO": 4,
+        "PIX": 5
+    },
+    "plano_assinatura": {
+        "BÁSICO": 0,
+        "PADRÃO": 1,
+        "PREMIUM": 2
+    },
+    "dispositivo_principal": {
+        "DESKTOP": 0,
+        "MOBILE": 1,
+        "TABLET": 2,
+        "TV": 3
+    },
+    "categoria_favorita": {
+        "DOCUMENTÁRIOS": 0,
+        "ESPORTES": 1,
+        "FILMES": 2,
+        "INFANTIL": 3,
+        "NOVELAS": 4,
+        "SÉRIES": 5
+    }
+}
