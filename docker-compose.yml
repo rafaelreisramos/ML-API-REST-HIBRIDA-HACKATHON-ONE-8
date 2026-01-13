@@ -15,7 +15,9 @@ services:
 
   # --- Python AI Service ---
   ai-service:
-    build: ./ai_service
+    build:
+      context: .
+      dockerfile: ai_service/Dockerfile
     container_name: ai-service
     ports:
       - "5000:5000"
