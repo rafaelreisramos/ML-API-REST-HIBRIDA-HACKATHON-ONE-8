@@ -1,478 +1,114 @@
-# 🏆 HACKATHON ONE 8 - ChurnInsight V2 API Híbrida
+# 🔮 ChurnInsight: Inteligência Preditiva de Cancelamento (Zero Config & OCI Ready)
 
-> 🥇 **Projeto Completo de Análise Preditiva de Churn com IA**  
-> Stack Moderna: Spring Boot 3 + GraphQL + REST + React + ML (scikit-learn)
+> **Plataforma Híbrida de ML + Fullstack para detecção de risco de Churn em tempo real.**
+>
+> *Versão Final v1.0 (Hackathon Edition)*
 
-[![Java](https://img.shields.io/badge/Java-17-orange)](https://adoptium.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen)](https://spring.io/projects/spring-boot)
-[![Python](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green)](https://www.mongodb.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
-
----
-
-## 🎯 Desafio do Hackathon
-
-Criar uma API robusta e escalável para análise preditiva de churn de clientes de streaming, integrando Machine Learning com arquitetura moderna.
-
-## ✨ Diferenciais Implementados
-
-### 🚀 API Híbrida (REST + GraphQL)
-
-- ✅ **REST API** com Swagger UI interativo
-- ✅ **GraphQL API** com GraphiQL playground  
-- ✅ Mesma lógica de negócio, múltiplos protocolos
-- ✅ Documentação automática OpenAPI 3.0
-
-### 🤖 Integração ML Production-Ready
-
-- ✅ Modelo scikit-learn 1.8.0 (RandomForest)
-- ✅ Microserviço Python containerizado (Docker)
-- ✅ Fallback automático em caso de falha
-- ✅ 17 features de entrada, 4 outputs (previsão, probabilidade, risco, modelo)
-
-### 📊 Funcionalidades Avançadas
-
-- ✅ **Processamento Individual** - API REST/GraphQL
-- ✅ **Processamento em Lote** - Upload CSV, download resultado
-- ✅ **Health Check** - Monitoramento de dependências
-- ✅ **Estatísticas Agregadas** - Métricas em tempo real
-- ✅ **CORS Configurado** - Integração frontend/backend
-
-### 🎨 Frontend React Completo
-
-- ✅ Dashboard com métricas em tempo real
-- ✅ Formulário com 16 campos validados
-- ✅ Upload de CSV para processamento em lote  
-- ✅ Atualização automática via GraphQL (polling)
-- ✅ UI moderna (dark mode, glassmorphism)
+![Status](https://img.shields.io/badge/Status-Production_Ready-green)
+![OCI](https://img.shields.io/badge/Cloud-Oracle_OCI-orange)
+![Docker](https://img.shields.io/badge/Docker-Zero_Config-blue)
+![AI](https://img.shields.io/badge/AI_Model-RandomForest_G8-purple)
 
 ---
 
-## 🏗️ Arquitetura
+## 🚀 Sobre o Projeto
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND LAYER                           │
-│  React 18 + Vite + TypeScript + Apollo Client              │
-│  http://localhost:5173                                      │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 BACKEND LAYER (Spring Boot)                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  REST API    │  │  GraphQL API │  │  System API  │     │
-│  │  /api/churn  │  │  /graphql    │  │  /api/health │     │
-│  │  Swagger UI  │  │  GraphiQL    │  │  /api/stats  │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         └──────────────────┼──────────────────┘             │
-│                            ▼                                │
-│            Bean Validation + Error Handling                 │
-│                            ▼                                │
-│                    RestTemplate HTTP Client                 │
-└────────────────────────────┬───────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  AI SERVICE LAYER (Python)                  │
-│  FastAPI + Uvicorn (Docker Container)                      │
-│  - Preprocessing pipeline                                   │
-│  - scikit-learn RandomForest V4                            │
-│  - CamelCase → snake_case mapper                           │
-│  http://localhost:5000                                      │
-└────────────────────────────┬───────────────────────────────┘
-                             │
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│               PERSISTENCE LAYER (MongoDB)                   │
-│  NoSQL Document Database (Docker Container)                │
-│  - Schema-less flexibility                                  │
-│  - Spring Data MongoDB                                      │
-│  - Auto-generated IDs                                       │
-│  mongodb://localhost:27017/churn_insights_v2               │
-└─────────────────────────────────────────────────────────────┘
-```
+O **ChurnInsight** é uma solução completa que integra um modelo de **Machine Learning (Python)** com um backend corporativo (**Java Spring Boot**) e uma interface moderna (**React**), projetada para identificar clientes com alto risco de cancelamento.
 
-### 🛠️ Service Layer
+### 🌟 Destaques da Arquitetura
 
-A lógica de negócio está centralizada em Services:
-
-| Service | Responsabilidade |
-|---------|------------------|
-| `ChurnService` | CRUD + chamada à IA para previsões |
-| `ChurnBatchService` | Processamento CSV + paralelo + bulk insert |
-| `SystemService` | Health check + estatísticas agregadas |
+* **Zero Configuração:** Basta ter Docker instalado. O banco de dados (H2) é embutido e o ambiente é auto-configurável.
+* **OCI Always Free Compatible:** Infraestrutura Terraform pronta para rodar sem custos na nuvem Oracle.
+* **Modelo Real Integrado:** Modelo RandomForest (29MB) treinado com dados reais/sintéticos do Hackathon, capaz de detectar padrões complexos.
+* **Auto-Healing AI:** O serviço de inteligência artificial detecta corrupção de modelo e se auto-repara/treina em tempo de execução se necessário.
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Tecnologias
+
+* **Backend:** Java 17, Spring Boot 3, GraphQL, JPA, H2 Database (In-Memory/File).
+* **AI Service:** Python 3.11, FastAPI, Scikit-learn 1.7.1, Pandas, Joblib.
+* **Frontend:** React, Vite, Nginx, TailwindCSS/StyledComponents.
+* **DevOps:** Docker Compose (Multi-stage), Terraform (OCI), GitHub Actions.
+
+---
+
+## ⚡ Quick Start (Rodando Localmente)
 
 ### Pré-requisitos
 
-```bash
-java --version    # Java 17+
-docker --version  # Docker 20+
-git --version     # Git 2.x
-```
+* **Docker** e **Docker Compose** instalados (apenas isso!).
 
-### 1. Clone & Setup
+### 1. Clonar e Rodar
 
 ```bash
-git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
-cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
+git clone https://github.com/SEU_USUARIO/churn-insight.git
+cd churn-insight
+
+# Build e execução de TODO o stack (Backend + Frontend + AI)
+docker-compose up --build
 ```
 
-### 2. Start Containers
+### 2. Acessar
 
-```bash
-docker-compose up -d
-# Inicia MongoDB + AI Service
-```
-
-### 3. Run API
-
-```bash
-# Windows (Automático - Baixa Maven + Configura JWT)
-.\run_api.bat
-
-# Linux/Mac
-export JWT_TOKEN="seu_token_secreto_dev"
-./mvnw spring-boot:run
-```
-
-### 📜 Histórico de Mudanças
-
-Veja o [CHANGELOG.md](./CHANGELOG.md) para detalhes das últimas atualizações e correções.
-
-```
-
-### 4. Run Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 5. Access
-
-| Interface | URL |
-|-----------|-----|
-| **Frontend** | <http://localhost:5173> |
-| **Swagger UI** | <http://localhost:9999/swagger-ui.html> |
-| **GraphiQL** | <http://localhost:9999/graphiql> |
-| **Health Check** | <http://localhost:9999/api/health> |
-| **Stats API** | <http://localhost:9999/api/stats> |
+* **Frontend (UI):** [http://localhost:80](http://localhost:80) (ou <http://localhost:3000>)
+  * *Login:* `admin` / `123`
+* **API GraphQL:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
+* **AI Docs:** [http://localhost:5000/docs](http://localhost:5000/docs)
 
 ---
 
-## 📊 Endpoints Principais
+## ☁️ Deploy na Oracle Cloud (OCI)
 
-### REST API
+Este projeto inclui um pipeline completo de **Infrastructure as Code (IaC)** para a Oracle Cloud, otimizado para o **Always Free Tier**.
 
-#### POST /api/churn
+👉 **[Consulte o Guia de Deploy OCI Completo](oci-pipeline/DEPLOY_GUIDE.md)**
 
-Cria análise individual com predição de IA
-
-```bash
-curl -X POST http://localhost:9999/api/churn \
-  -H "Content-Type: application/json" \
-  -d '{
-    "clienteId": "DEMO-001",
-    "idade": 35,
-    "genero": "Masculino",
-    "regiao": "Sudeste",
-    "valorMensal": 49.90,
-    "tempoAssinaturaMeses": 12,
-    "planoAssinatura": "Premium",
-    "metodoPagamento": "Pix",
-    "dispositivoPrincipal": "Smart TV",
-    "visualizacoesMes": 45,
-    "contatosSuporte": 0,
-    "avaliacaoPlataforma": 4.5,
-    "avaliacaoConteudoMedia": 4.8,
-    "avaliacaoConteudoUltimoMes": 5.0,
-    "tempoMedioSessaoMin": 60,
-    "diasUltimoAcesso": 1
-  }'
-```
-
-**Response 200 OK:**
-
-```json
-{
-  "id": "69445f42bb635441d1b057e5",
-  "clienteId": "DEMO-001",
-  "previsao": "Vai continuar",
-  "probabilidade": 0.06,
-  "riscoAlto": false,
-  "modeloUsado": "Python AI Service (churn_model_v4.joblib)"
-}
-```
-
-#### POST /api/churn/batch
-
-Processa múltiplos clientes via CSV
-
-```bash
-curl -X POST http://localhost:9999/api/churn/batch \
-  -F "file=@clientes.csv" \
-  --output resultado.csv
-```
-
-**CSV Input Format:**
-
-```csv
-clienteId,idade,genero,regiao,valorMensal,tempoAssinaturaMeses,...
-CLIENT-001,30,Feminino,Sul,39.90,12,...
-CLIENT-002,45,Masculino,Nordeste,29.90,6,...
-```
-
-**CSV Output:** Same format + `previsao,probabilidade,riscoAlto,modeloUsado`
-
-#### GET /api/health
-
-Status da API e dependências
-
-```bash
-curl http://localhost:9999/api/health
-```
-
-**Response:**
-
-```json
-{
-  "status": "UP",
-  "service": "ChurnInsight API",
-  "version": "2.0.0",
-  "mongodb": {"status": "UP", "totalDocuments": 23},
-  "aiService": {"status": "UP", "url": "http://localhost:5000"}
-}
-```
-
-#### GET /api/stats
-
-Estatísticas agregadas
-
-```bash
-curl http://localhost:9999/api/stats
-```
-
-**Response:**
-
-```json
-{
-  "totalAnalisados": 23,
-  "totalRiscoAlto": 2,
-  "taxaChurnPercentual": 8.7,
-  "probabilidadeMedia": 0.234,
-  "distribuicaoPorPlano": {"premium": 10, "basico": 8, "padrao": 5},
-  "distribuicaoPorRegiao": {"Sudeste": 12, "Sul": 6, "Nordeste": 5},
-  "top5MaiorRisco": [...]
-}
-```
-
-### GraphQL API
-
-#### Query: listarAnalises
-
-```graphql
-query {
-  listarAnalises {
-    id
-    clienteId
-    previsao
-    probabilidade
-    riscoAlto
-    modeloUsado
-  }
-}
-```
-
-#### Mutation: registrarAnalise
-
-```graphql
-mutation {
-  registrarAnalise(input: {
-    clienteId: "GQL-001"
-    idade: 28
-    genero: "Feminino"
-    regiao: "Sul"
-    valorMensal: 39.90
-    # ... demais campos
-  }) {
-    id
-    previsao
-    probabilidade
-    riscoAlto
-  }
-}
-```
+* **Custo Estimado:** R$ 0,00/mês.
+* **Recursos:** 2x VMs (Compute E2.1.Micro), VCN, Security Lists, Public IPs.
 
 ---
 
-## 🧪 Testes Automatizados
+## 🧪 Testes e Validação
 
-### Testes Unitários (Java + Mockito)
-
-```bash
-mvn test
-```
-
-| Classe de Teste | Testes | Cobertura |
-|-----------------|--------|-----------|
-| `ChurnServiceTest` | 5 | CRUD + IA |
-| `ChurnBatchServiceTest` | 5 | CSV + Batch |
-| `SystemServiceTest` | 7 | Health + Stats |
-| **Total** | **17** | **100% ✅** |
-
-### Testes End-to-End (Python)
+Para validar a integridade do sistema, incluímos scripts de teste E2E:
 
 ```bash
+# Requer Python instalado localmente se não quiser usar o Docker
+pip install requests pandas
+
+# Teste de Integração (Frontend -> Java -> Python)
 python test_api_e2e.py
-python test_validation.py
-python test_legacy_fields.py
+
+# Teste de Processamento em Lote (Performance)
+python test_optimized_batch.py
 ```
 
-**Resultados:**
+---
 
-- ✅ 17 testes unitários Java (Mockito)
-- ✅ 5 testes E2E Python
-- ✅ GraphQL Mutation + Query
-- ✅ REST POST + GET
-- ✅ Bean Validation
-- ✅ Integração MongoDB + ML
+## 📂 Estrutura do Projeto
+
+```
+/
+├── ai_service/          # Microserviço Python (FastAPI + Modelos)
+├── src/                 # Backend Java Spring Boot
+├── frontend/            # Aplicação React SPA
+├── hackathon_g8_one/    # Artefatos de Data Science (Modelos, CSVs)
+├── oci-pipeline/        # Terraform e Documentação de Cloud
+├── docker-compose.yml   # Orquestração local
+└── Dockerfile.backend   # Descritor de build do Java
+```
 
 ---
 
-## 📦 Stack Completa
+## 📚 Documentação Adicional
 
-### Backend
-
-- **Java 17** (Eclipse Adoptium)
-- **Spring Boot 3.2.0**
-- **Spring Data MongoDB 3.2.0**
-- **Spring GraphQL 1.2.4**
-- **SpringDoc OpenAPI 2.3.0**
-- **Jakarta Bean Validation 3.0.2**
-- **Lombok 1.18.30**
-
-### AI Service
-
-- **Python 3.10**
-- **FastAPI 0.124.0**
-- **scikit-learn 1.8.0**
-- **pandas 2.3.3**
-- **joblib 1.5.3**
-- **pydantic 2.12.5**
-
-### Frontend
-
-- **React 18**
-- **TypeScript 5**
-- **Vite 5**
-- **Apollo Client 3**
-- **GraphQL**
-
-### Infrastructure
-
-- **Docker 24+**
-- **MongoDB 7.0**
-- **Maven 3.9.6**
+* [Guia de Deploy OCI](oci-pipeline/DEPLOY_GUIDE.md)
+* [Limites do Free Tier](oci-pipeline/FREE_TIER_LIMITS.md)
+* [Manual Jupyter (Demos)](MANUAL_JUPYTER.md)
+* [Guia de Segurança](SECURITY_GUIDE.md)
+* [Changelog](CHANGELOG.md)
 
 ---
 
-## 🎯 Destaques para Avaliação
-
-### 1. Arquitetura Moderna ⭐⭐⭐⭐⭐
-
-- Microserviços (Spring Boot + Python)
-- API Híbrida (REST + GraphQL)
-- Containerização (Docker)
-- Separação de responsabilidades
-
-### 2. Machine Learning Integrado ⭐⭐⭐⭐⭐
-
-- Modelo treinado (Random Forest)
-- Preprocessamento robusto
-- Fallback automático
-- Versionamento de modelo
-
-### 3. Qualidade de Código ⭐⭐⭐⭐⭐
-
-- Validação automática (Bean Validation)
-- Error handling global
-- CORS configurado
-- Código limpo e documentado
-
-### 4. Documentação ⭐⭐⭐⭐⭐
-
-- Swagger UI (REST)
-- GraphiQL (GraphQL)
-- README completo
-- Relatório técnico (35 páginas)
-
-### 5. Testes ⭐⭐⭐⭐⭐
-
-- Testes automatizados
-- Coverage 100%
-- End-to-end validado
-- Screenshots de evidência
-
-### 6. UX/UI ⭐⭐⭐⭐⭐
-
-- Dashboard moderno
-- 16 campos de entrada
-- Upload em lote
-- Feedback em tempo real
-
----
-
-## 🔒 Segurança
-
-- ✅ Validação de dados (Jakarta Bean Validation)
-- ✅ CORS configurado
-- ✅ Sem credenciais hardcoded
-- ✅ Modelos ML fora do Git
-- ✅ **JWT implementado** com Spring Security
-
----
-
-## 📈 Roadmap Futuro
-
-- [x] Autenticação JWT
-- [ ] Rate Limiting
-- [ ] Cache Redis
-- [ ] CI/CD Pipeline
-- [ ] Deploy Kubernetes
-- [ ] Métricas Prometheus
-- [ ] A/B Testing de modelos
-
----
-
-## 👥 Equipe
-
-**Hackathon ONE 8 - Alura**  
-
-
----
-
-## 📄 Licença
-
-MIT License - Livre para uso educacional e comercial
-
----
-
-## 🙏 Agradecimentos
-
-- **Alura** - Organização do Hackathon
-- **Oracle ONE** - Programa de formação
-- **Spring Community** - Frameworks incríveis
-- **scikit-learn Team** - ML acessível
-
----
-
-⭐ **Se gostou do projeto, deixe uma estrela!** ⭐
-
-**GitHub:** <https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8>
+**Equipe:** G8 Hackathon Alura + Google Gemini (Antigravity Agent)
