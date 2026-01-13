@@ -1,0 +1,59 @@
+#cloud-config
+# Cloud-init para AI Service Server
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker
+  - git
+  - python3
+  - python3-pip
+
+runcmd:
+  # Iniciar Docker
+  - systemctl enable docker
+  - systemctl start docker
+
+  # Adicionar usuário opc ao grupo docker
+  - usermod -aG docker opc
+
+  # Criar diretórios
+  - mkdir -p /opt/churninsight-ai
+  - cd /opt/churninsight-ai
+
+  # Clonar repositório
+  - git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git .
+
+  # Executar setup do projeto (copiar artefatos do modelo)
+  - python3 setup_project.py
+
+  # Build da imagem AI Service
+  - docker-compose build ai-service
+
+  # Iniciar AI Service
+  - docker-compose up -d ai-service
+
+  # Configurar firewall (apenas para VCN interna)
+  - firewall-cmd --permanent --add-port=5000/tcp
+  - firewall-cmd --reload
+
+write_files:
+  - path: /etc/systemd/system/churninsight-ai.service
+    content: |
+      [Unit]
+      Description=ChurnInsight AI Service
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/churninsight-ai
+      ExecStart=/usr/bin/docker-compose up -d ai-service
+      ExecStop=/usr/bin/docker-compose down
+
+      [Install]
+      WantedBy=multi-user.target
+
+final_message: "ChurnInsight AI Server is ready!"

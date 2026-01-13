@@ -23,6 +23,8 @@ COPY hackathon_g8_one/data/X_train.csv /app/models/
 COPY hackathon_g8_one/data/y_train.csv /app/models/
 COPY hackathon_g8_one/models/rfe_selector.joblib /app/models/
 COPY hackathon_g8_one/models/threshold_otimo.txt /app/models/
+COPY hackathon_g8_one/models/features_selecionadas_rfe.csv /app/models/
+COPY hackathon_g8_one/models/label_encoders_g8.json /app/models/
 
 # Copiar o modelo treinado (quando disponível do time de DS)
 COPY hackathon_g8_one/models/modelo_churn.joblib /app/models/

@@ -1,0 +1,88 @@
+#cloud-config
+# Cloud-init para App Server (Frontend + Backend)
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker
+  - docker-compose
+  - git
+  - nginx
+
+runcmd:
+  # Iniciar Docker
+  - systemctl enable docker
+  - systemctl start docker
+
+  # Adicionar usuário opc ao grupo docker
+  - usermod -aG docker opc
+
+  # Criar diretórios
+  - mkdir -p /opt/churninsight
+  - cd /opt/churninsight
+
+  # Clonar repositório (substitua pela URL real)
+  - git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git .
+
+  # Configurar variáveis de ambiente
+  - echo "ML_SERVICE_URL=http://AI_SERVER_IP:5000" > .env
+  - echo "SERVER_PORT=9999" >> .env
+
+  # Build do Backend
+  - docker build -t churninsight-backend:latest -f Dockerfile.backend .
+
+  # Build do Frontend
+  - docker build -t churninsight-frontend:latest frontend/
+
+  # Criar docker-compose.yml para produção
+  - |
+    cat > docker-compose.prod.yml <<EOF
+    version: '3.8'
+    services:
+      backend:
+        image: churninsight-backend:latest
+        container_name: backend
+        ports:
+          - "9999:9999"
+        environment:
+          - ML_SERVICE_URL=http://AI_SERVER_IP:5000
+          - SPRING_PROFILES_ACTIVE=prod
+        restart: unless-stopped
+      
+      frontend:
+        image: churninsight-frontend:latest
+        container_name: frontend
+        ports:
+          - "80:80"
+        restart: unless-stopped
+    EOF
+
+  # Iniciar serviços
+  - docker-compose -f docker-compose.prod.yml up -d
+
+  # Configurar firewall
+  - firewall-cmd --permanent --add-service=http
+  - firewall-cmd --permanent --add-service=https
+  - firewall-cmd --permanent --add-port=9999/tcp
+  - firewall-cmd --reload
+
+write_files:
+  - path: /etc/systemd/system/churninsight.service
+    content: |
+      [Unit]
+      Description=ChurnInsight Application
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/churninsight
+      ExecStart=/usr/bin/docker-compose -f docker-compose.prod.yml up -d
+      ExecStop=/usr/bin/docker-compose -f docker-compose.prod.yml down
+
+      [Install]
+      WantedBy=multi-user.target
+
+final_message: "ChurnInsight App Server is ready!"

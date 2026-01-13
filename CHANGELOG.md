@@ -1,5 +1,32 @@
 # Histórico de Mudanças (Changelog)
 
+## [2026-01-13] - Zero Config & OCI Production Ready
+
+Finalização do projeto com foco em "Zero Configuration" para execução local e preparação total para deploy em nuvem (OCI).
+
+### 🚀 Infraestrutura & Cloud (OCI)
+
+* **OCI Pipeline:** Criada infraestrutura completa como código (Terraform) para **Oracle Cloud Always Free Tier**.
+* **Zero Cost:** Arquitetura otimizada para R$ 0,00/mês (2x VMs E2.1.Micro).
+* **CI/CD:** Pipeline GitHub Actions para build e deploy automático.
+
+### 🐳 Docker Profissional
+
+* **Self-Contained:** Dockerfiles refatorados (Multi-stage build) que eliminam dependências externas.
+* **Otimização:** Build do AI Service inclui modelo real (29MB) e dependências (`scikit-learn==1.7.1`).
+* **Cleanup:** Remoção de 3.5GB de arquivos temporários e scripts de debug.
+
+### 🧠 Integração AI Definitiva
+
+* **Modelo Real:** Substituição do placeholder (79 bytes) pelo modelo treinado real (29MB).
+* **Correção de Dependências:** Sincronização de versões (`scikit-learn` atualizado) para eliminar warnings.
+* **Auto-Healing:** Mecanismo mantido como fallback de segurança.
+* **Testes:** Validação completa (Java Backend + AI Service + Batch Processing).
+
+### 💾 Banco de Dados
+
+* **H2 Database:** Migração completa de MongoDB para H2 (In-Memory/File), eliminando necessidade de instalação de banco local.
+
 ## [2026-01-12] - Integração do Modelo V8 + E2E Cirúrgico
 
 Integração completa do modelo de machine learning `hackathon_g8_one` (V8) com pipeline de pré-processamento avançado.

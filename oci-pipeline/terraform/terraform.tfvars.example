@@ -1,0 +1,43 @@
+# ============================================================================
+# OCI Always Free Tier - Configuração de Exemplo
+# ============================================================================
+# Copie este arquivo para terraform.tfvars e preencha com seus valores
+
+# Credenciais OCI (obtenha do console OCI > User Settings > API Keys)
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+user_ocid        = "ocid1.user.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+fingerprint      = "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
+private_key_path = "~/.oci/oci_api_key.pem"
+
+# Região (Always Free disponível em todas as regiões)
+region = "sa-saopaulo-1" # ou us-ashburn-1, us-phoenix-1, etc.
+
+# Compartment (obtenha do console OCI > Identity > Compartments)
+compartment_ocid = "ocid1.compartment.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# SSH Key (gere com: ssh-keygen -t rsa -b 4096)
+# Cole o conteúdo de ~/.ssh/id_rsa.pub aqui
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... seu-email@exemplo.com"
+
+# Projeto
+project_name = "churninsight"
+environment  = "prod"
+
+# Availability Domain (verifique qual AD tem recursos Always Free disponíveis)
+# No console: Compute > Instances > Create Instance > veja ADs disponíveis
+availability_domain = "1" # Geralmente AD-1
+
+# Imagem Oracle Linux 8 (obtenha o OCID mais recente)
+# No console: Compute > Images > Oracle Linux 8
+# Ou use o data source (recomendado - já configurado no main.tf)
+# instance_image_ocid = "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaaxxxxxxxx"
+
+# Tags (opcional)
+tags = {
+  Project     = "ChurnInsight"
+  ManagedBy   = "Terraform"
+  Environment = "Production"
+  Tier        = "AlwaysFree"
+  Team        = "Data Science"
+  CostCenter  = "Free"
+}

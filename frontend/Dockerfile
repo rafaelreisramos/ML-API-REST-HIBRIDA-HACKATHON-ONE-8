@@ -1,18 +1,41 @@
-FROM node:18-alpine
+# ============================================================================
+# Multi-stage build para Frontend React/Vite
+# ============================================================================
+
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copia arquivos de dependência
+# Copiar package files
 COPY package*.json ./
 
-# Instala dependências
-RUN npm install
+# Install dependencies
+RUN npm ci
 
-# Copia o restante do código fonte
+# Copiar código fonte
 COPY . .
 
-# Expõe a porta padrão do Vite
-EXPOSE 5173
+# Build da aplicação
+RUN npm run build
 
-# Roda o servidor de desenvolvimento com host exposto
-CMD ["npm", "run", "dev", "--", "--host"]
+# ============================================================================
+# Runtime stage com Nginx
+# ============================================================================
+
+FROM nginx:alpine
+
+# Copiar build do stage anterior
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copiar configuração customizada do Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expor porta
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# Nginx roda como daemon off por padrão na imagem oficial
+CMD ["nginx", "-g", "daemon off;"]
