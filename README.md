@@ -72,7 +72,7 @@ Se você estiver usando Windows com **WSL 2**, criamos scripts para facilitar su
 ./scripts/run_e2e_tests.sh
 ```
 
-👉 *Para mais detalhes sobre problemas e soluções, veja o [Guia de Troubleshooting](TROUBLESHOOTING.md).*
+👉 *Para mais detalhes sobre problemas e soluções, veja o [Manual de Erros](MANUAL_DE_ERROS.md).*
 
 ---
 
