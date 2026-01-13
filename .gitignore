@@ -39,6 +39,7 @@ frontend/.env.local
 *.joblib
 !ai_service/models/modelo_churn.joblib
 !hackathon_g8_one/models/modelo_churn.joblib
+!hackathon_g8_one/models/rfe_selector.joblib
 *.pkl
 *.h5
 *.pth
