@@ -11,6 +11,9 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Fix Windows usage: Convert CRLF to LF and ensure execution permissions
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
+
 # Download dependencies (cache layer)
 RUN ./mvnw dependency:go-offline -B
 
