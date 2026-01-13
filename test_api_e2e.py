@@ -2,7 +2,11 @@ import urllib.request
 import json
 import sys
 
-BASE_URL = "http://localhost:9999"
+import os
+
+# Detecta URL via variável de ambiente (útil para WSL/Docker)
+BASE_URL = os.getenv("API_URL", "http://localhost:9999")
+print(f"📡 Usando API em: {BASE_URL}")
 GRAPHQL_URL = f"{BASE_URL}/graphql"
 LOGIN_URL = f"{BASE_URL}/login"
 REGISTER_URL = f"{BASE_URL}/usuarios"
