@@ -58,6 +58,24 @@ docker-compose up --build
 
 ---
 
+---
+
+## 🐧 Suporte a WSL 2 / Linux
+
+Se você estiver usando Windows com **WSL 2**, criamos scripts para facilitar sua vida e resolver erros comuns de permissão e credenciais do Docker Desktop:
+
+```bash
+# Corrige erro "exec format error / docker-credential-desktop.exe"
+./scripts/fix_wsl_docker.sh
+
+# Roda os testes E2E ignorando bloqueios de Firewall do Windows
+./scripts/run_e2e_tests.sh
+```
+
+👉 *Para mais detalhes sobre problemas e soluções, veja o [Guia de Troubleshooting](TROUBLESHOOTING.md).*
+
+---
+
 ## ☁️ Deploy na Oracle Cloud (OCI)
 
 Este projeto inclui um pipeline completo de **Infrastructure as Code (IaC)** para a Oracle Cloud, otimizado para o **Always Free Tier**.
@@ -74,7 +92,10 @@ Este projeto inclui um pipeline completo de **Infrastructure as Code (IaC)** par
 Para validar a integridade do sistema, incluímos scripts de teste E2E:
 
 ```bash
-# Requer Python instalado localmente se não quiser usar o Docker
+# Opção 1: Via Script (Recomendado para WSL/Docker)
+./scripts/run_e2e_tests.sh
+
+# Opção 2: Localmente (Requer Python instalado)
 pip install requests pandas
 
 # Teste de Integração (Frontend -> Java -> Python)
