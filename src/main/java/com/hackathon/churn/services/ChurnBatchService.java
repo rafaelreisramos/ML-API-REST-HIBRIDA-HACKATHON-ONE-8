@@ -3,10 +3,8 @@ package com.hackathon.churn.services;
 import com.hackathon.churn.ChurnData;
 import com.hackathon.churn.Repository.ChurnRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import com.hackathon.churn.Repository.ChurnRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,9 +26,6 @@ public class ChurnBatchService {
 
     @Autowired
     private ChurnService churnService;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     // Configurações de paralelismo
     private static final int THREAD_POOL_SIZE = 20;
@@ -117,14 +112,20 @@ public class ChurnBatchService {
      * Retorna o número de registros arquivados.
      */
     public long arquivarDashboard() {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("ativo").is(true));
+        // Implementação JPA para Soft Delete em Lote
+        List<ChurnData> ativos = repository.findByAtivoTrue();
+        long count = ativos.size();
 
-        Update update = new Update();
-        update.set("ativo", false);
-        update.set("dataArquivamento", LocalDateTime.now());
+        if (count > 0) {
+            LocalDateTime agora = LocalDateTime.now();
+            ativos.forEach(d -> {
+                d.setAtivo(false);
+                d.setDataArquivamento(agora);
+            });
+            repository.saveAll(ativos);
+        }
 
-        return mongoTemplate.updateMulti(query, update, ChurnData.class).getModifiedCount();
+        return count;
     }
 
     /**
@@ -182,6 +183,15 @@ public class ChurnBatchService {
         }
 
         String[] headers = headerLine.split(",");
+
+        // Remove BOM se existir (comum em arquivos Windows/Excel)
+        if (headers.length > 0 && headers[0].startsWith("\uFEFF")) {
+            headers[0] = headers[0].substring(1);
+        }
+
+        // Trim headers
+        for (int i = 0; i < headers.length; i++)
+            headers[i] = headers[i].trim();
 
         String line;
         while ((line = reader.readLine()) != null) {

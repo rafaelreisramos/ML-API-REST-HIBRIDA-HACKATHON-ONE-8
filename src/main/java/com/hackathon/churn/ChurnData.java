@@ -1,17 +1,18 @@
 package com.hackathon.churn;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Data
-@Document(collection = "analises_churn") // Nome da coleção no MongoDB
+@Entity
+@Table(name = "analises_churn")
 public class ChurnData {
 
     @Id
-    private String id; // MongoDB usa String (ObjectId) por padrão
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private LocalDateTime dataAnalise = LocalDateTime.now();
 

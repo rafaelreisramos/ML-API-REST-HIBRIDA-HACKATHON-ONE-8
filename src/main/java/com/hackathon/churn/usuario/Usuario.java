@@ -1,12 +1,10 @@
 package com.hackathon.churn.usuario;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,19 +16,20 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "usuarios")
+@Entity
+@Table(name = "usuarios")
 public class Usuario implements UserDetails {
 
     @Id
-    private ObjectId id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private String login;
     private String senha;
 
-    public Usuario(DadosUsuario dados){
+    public Usuario(DadosUsuario dados) {
         this.login = dados.login();
         this.senha = dados.senha();
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

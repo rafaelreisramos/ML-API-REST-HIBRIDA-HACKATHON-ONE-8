@@ -1,12 +1,11 @@
 package com.hackathon.churn.Repository;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.hackathon.churn.usuario.Usuario;
 
 import java.util.Optional;
 
-public interface UsuarioRepository extends MongoRepository<Usuario, ObjectId> {
+public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     Usuario findByLogin(String login);
 

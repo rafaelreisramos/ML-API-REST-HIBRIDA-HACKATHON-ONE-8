@@ -1,11 +1,10 @@
 package com.hackathon.churn.Repository;
 
 import com.hackathon.churn.ChurnData;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface ChurnRepository extends MongoRepository<ChurnData, String> {
-
+public interface ChurnRepository extends JpaRepository<ChurnData, String> {
 
     List<ChurnData> findByRiscoAltoTrue();
 
