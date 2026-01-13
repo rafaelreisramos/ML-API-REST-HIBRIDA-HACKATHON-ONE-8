@@ -105,6 +105,7 @@ python test_optimized_batch.py
 
 * [Guia de Deploy OCI](oci-pipeline/DEPLOY_GUIDE.md)
 * [Limites do Free Tier](oci-pipeline/FREE_TIER_LIMITS.md)
+* [Manual Jupyter (Demos)](MANUAL_JUPYTER.md)
 * [Guia de Segurança](SECURITY_GUIDE.md)
 * [Changelog](CHANGELOG.md)
 

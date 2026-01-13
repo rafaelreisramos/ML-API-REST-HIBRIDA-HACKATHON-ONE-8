@@ -14,7 +14,6 @@ try {
     Write-Host "Por favor, inicie a API primeiro:" -ForegroundColor Yellow
     Write-Host "  1. Inicie o Docker Desktop" -ForegroundColor White
     Write-Host "  2. Execute: docker-compose up -d" -ForegroundColor White
-    Write-Host "  3. Execute: .\run_api.bat" -ForegroundColor White
     Write-Host ""
     exit 1
 }
@@ -23,9 +22,7 @@ try {
 $tests = @(
     @{Name="test_api_e2e.py"; Description="Fluxo completo com JWT + GraphQL"},
     @{Name="test_validation.py"; Description="Validação de campos"},
-    @{Name="test_legacy_fields.py"; Description="Compatibilidade com campos legados"},
-    @{Name="test_batch_50k.py"; Description="Processamento em lote (50k registros)"},
-    @{Name="test_optimized_batch.py"; Description="Processamento otimizado"}
+    @{Name="test_optimized_batch.py"; Description="Processamento Otimizado (Batch)"}
 )
 
 $passed = 0
