@@ -40,8 +40,8 @@ services:
   # --- Frontend (React/Vite + Nginx) ---
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: frontend-ui
     ports:
       - "80:80" # Porta padrão HTTP
