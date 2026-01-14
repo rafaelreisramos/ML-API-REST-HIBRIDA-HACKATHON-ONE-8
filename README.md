@@ -1,135 +1,121 @@
-# 🔮 ChurnInsight: Inteligência Preditiva de Cancelamento (Zero Config & OCI Ready)
+# 🔮 ChurnInsight: Inteligência Preditiva de Cancelamento
 
-> **Plataforma Híbrida de ML + Fullstack para detecção de risco de Churn em tempo real.**
+> **Plataforma Híbrida (Java + Python + React) para detecção de risco de Churn em tempo real.**
 >
-> *Versão Final v1.0 (Hackathon Edition)*
+> *Versão Final v1.0 (Hackathon Alura G8)*
 
 ![Status](https://img.shields.io/badge/Status-Production_Ready-green)
-![OCI](https://img.shields.io/badge/Cloud-Oracle_OCI-orange)
 ![Docker](https://img.shields.io/badge/Docker-Zero_Config-blue)
 ![AI](https://img.shields.io/badge/AI_Model-RandomForest_G8-purple)
+![Java](https://img.shields.io/badge/Backend-Java_Spring-orange)
+![React](https://img.shields.io/badge/Frontend-React_Vite-cyan)
 
 ---
 
-## 🚀 Sobre o Projeto
+## 🏗️ Arquitetura do Projeto
 
-O **ChurnInsight** é uma solução completa que integra um modelo de **Machine Learning (Python)** com um backend corporativo (**Java Spring Boot**) e uma interface moderna (**React**), projetada para identificar clientes com alto risco de cancelamento.
+O sistema opera sobre uma arquitetura de microserviços otimizada para deployment rápido e resiliência:
 
-### 🌟 Destaques da Arquitetura
-
-* **Zero Configuração:** Basta ter Docker instalado. O banco de dados (H2) é embutido e o ambiente é auto-configurável.
-* **OCI Always Free Compatible:** Infraestrutura Terraform pronta para rodar sem custos na nuvem Oracle.
-* **Modelo Real Integrado:** Modelo RandomForest (29MB) treinado com dados reais/sintéticos do Hackathon, capaz de detectar padrões complexos.
-* **Auto-Healing AI:** O serviço de inteligência artificial detecta corrupção de modelo e se auto-repara/treina em tempo de execução se necessário.
+```mermaid
+graph TD
+    User[Usuário] -->|Acessa via HTTP| Frontend[Frontend React (Porta 80)]
+    Frontend -->|GraphQL Query| Backend[Backend Java API (Porta 9999)]
+    Backend -->|REST POST /predict| AIService[AI Service Python (Porta 5000)]
+    
+    subgraph "AI Core (Python)"
+    AIService -->|Carrega| Model[RandomForest Model G8]
+    AIService -->|Feature Engineering| Preproc[Processing.py]
+    AIService -->|Auto-Healing| Rebuild[Rebuild Logic]
+    end
+    
+    subgraph "Backend Core (Java)"
+    Backend -->|Lê/Escreve| H2[H2 Database (Arquivo Local)]
+    Backend -->|Autenticação| Security[Spring Security JWT]
+    end
+```
 
 ---
 
-## 🛠️ Tecnologias
-
-* **Backend:** Java 17, Spring Boot 3, GraphQL, JPA, H2 Database (In-Memory/File).
-* **AI Service:** Python 3.11, FastAPI, Scikit-learn 1.7.1, Pandas, Joblib.
-* **Frontend:** React, Vite, Nginx, TailwindCSS/StyledComponents.
-* **DevOps:** Docker Compose (Multi-stage), Terraform (OCI), GitHub Actions.
-
----
-
-## ⚡ Quick Start (Rodando Localmente)
+## 🚀 Como Rodar (Zero Config)
 
 ### Pré-requisitos
 
-* **Docker** e **Docker Compose** instalados (apenas isso!).
+* **Docker** e **Docker Compose** instalados.
 
-### 1. Clonar e Rodar
+### Passo 1: Clonar e Iniciar
+
+Este projeto é "Battery Included". O comando abaixo sobe Backend, Frontend e AI Service, além de configurar o banco de dados.
 
 ```bash
-git clone https://github.com/SEU_USUARIO/churn-insight.git
-cd churn-insight
+git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
+cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
 
-# Build e execução de TODO o stack (Backend + Frontend + AI)
+# Iniciar todo o stack
 docker-compose up --build
 ```
 
-### 2. Acessar
+*Aguarde alguns minutos. O Backend Java demora um pouco para inicializar completamente.*
 
-* **Frontend (UI):** [http://localhost:80](http://localhost:80) (ou <http://localhost:3000>)
-  * *Login:* `admin` / `123`
-* **API GraphQL:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
-* **AI Docs:** [http://localhost:5000/docs](http://localhost:5000/docs)
+### Passo 2: Acessar o Sistema
+
+* **Dashboard (UI):** [http://localhost:80](http://localhost:80) (ou porta 3000 se 80 estiver ocupada)
+* **GraphQL API:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
+* **AI Documentation:** [http://localhost:5000/docs](http://localhost:5000/docs)
+
+**🔐 Credenciais Padrão:**
+
+* **Login:** `admin`
+* **Senha:** `123`
 
 ---
 
+## 🧠 Inteligência Artificial (Modelo G8)
+
+O sistema utiliza um modelo **RandomForest** customizado para prever o cancelamento de assinatura:
+
+1. **Features Híbridas:** O sistema aceita dados brutos (CamelCase) e os normaliza automaticamente para o formato de treino (SnakeCase), aplicando feature engineering e RFE (Recursive Feature Elimination).
+2. **Definição de Risco:**
+   * **🔴 Alto Risco:** Probabilidade > **42.87%** (Threshold Otimizado).
+   * **🟠 Risco Médio:** Probabilidade entre **25%** e **42.87%**.
+   * **🟢 Baixo Risco:** Probabilidade < **25%**.
+3. **Auto-Healing:** O container `ai-service` é capaz de reconstruir o modelo binário (`.joblib`) a partir dos dados de treino originais (`X_train.csv`) caso o arquivo do modelo seja corrompido ou perdido.
+
 ---
 
-## 🐧 Suporte a WSL 2 / Linux
+## 🛠️ Stack Tecnológico
 
-Se você estiver usando Windows com **WSL 2**, criamos scripts para facilitar sua vida e resolver erros comuns de permissão e credenciais do Docker Desktop:
+| Camada | Tecnologia | Destaques |
+|--------|------------|-----------|
+| **Frontend** | React, Vite | Dashboard responsivo, Grid Layout 6-col, TailwindCSS + StyledComponents. |
+| **Backend** | Java 17, Spring Boot 3 | API GraphQL, Spring Security, H2 Database, RestTemplate. |
+| **AI Service** | Python 3.11, FastAPI | Scikit-learn 1.7.1, Pandas, Joblib. Serialização robusta. |
+| **DevOps** | Docker Compose | Multi-stage builds, redes isoladas, volumes persistentes. |
 
-```bash
-# Corrige erro "exec format error / docker-credential-desktop.exe"
-./scripts/fix_wsl_docker.sh
+---
 
-# Roda os testes E2E ignorando bloqueios de Firewall do Windows
-./scripts/run_e2e_tests.sh
+## 📂 Estrutura de Diretórios
+
 ```
-
-👉 *Para mais detalhes sobre problemas e soluções, veja o [Manual de Erros](MANUAL_DE_ERROS.md).*
-
----
-
-## ☁️ Deploy na Oracle Cloud (OCI)
-
-Este projeto inclui um pipeline completo de **Infrastructure as Code (IaC)** para a Oracle Cloud, otimizado para o **Always Free Tier**.
-
-👉 **[Consulte o Guia de Deploy OCI Completo](oci-pipeline/DEPLOY_GUIDE.md)**
-
-* **Custo Estimado:** R$ 0,00/mês.
-* **Recursos:** 2x VMs (Compute E2.1.Micro), VCN, Security Lists, Public IPs.
+/
+├── ai_service/          # Microserviço Python (FastAPI + Modelos + Treinamento)
+├── src/                 # Código Fonte Java (Spring Boot Backend)
+├── frontend/            # Aplicação React (Vite)
+├── hackathon_g8_one/    # Artefatos Originais de Data Science
+├── docker-compose.yml   # Definição dos Serviços
+└── Dockerfile.backend   # Descritor de Build Java
+```
 
 ---
 
 ## 🧪 Testes e Validação
 
-Para validar a integridade do sistema, incluímos scripts de teste E2E:
+Para validar a integridade do sistema, incluímos scripts de teste:
 
 ```bash
-# Opção 1: Via Script (Recomendado para WSL/Docker)
+# Teste de Ponta-a-Ponta (E2E)
 ./scripts/run_e2e_tests.sh
-
-# Opção 2: Localmente (Requer Python instalado)
-pip install requests pandas
-
-# Teste de Integração (Frontend -> Java -> Python)
-python test_api_e2e.py
-
-# Teste de Processamento em Lote (Performance)
-python test_optimized_batch.py
 ```
 
 ---
 
-## 📂 Estrutura do Projeto
-
-```
-/
-├── ai_service/          # Microserviço Python (FastAPI + Modelos)
-├── src/                 # Backend Java Spring Boot
-├── frontend/            # Aplicação React SPA
-├── hackathon_g8_one/    # Artefatos de Data Science (Modelos, CSVs)
-├── oci-pipeline/        # Terraform e Documentação de Cloud
-├── docker-compose.yml   # Orquestração local
-└── Dockerfile.backend   # Descritor de build do Java
-```
-
----
-
-## 📚 Documentação Adicional
-
-* [Guia de Deploy OCI](oci-pipeline/DEPLOY_GUIDE.md)
-* [Limites do Free Tier](oci-pipeline/FREE_TIER_LIMITS.md)
-* [Manual Jupyter (Demos)](MANUAL_JUPYTER.md)
-* [Guia de Segurança](SECURITY_GUIDE.md)
-* [Changelog](CHANGELOG.md)
-
----
-
-**Equipe:** G8 Hackathon Alura + Google Gemini (Antigravity Agent)
+**Desenvolvido por:** Equipe G8 Hackathon Alura
