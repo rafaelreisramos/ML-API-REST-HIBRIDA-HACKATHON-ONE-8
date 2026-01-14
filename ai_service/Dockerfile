@@ -27,7 +27,7 @@ COPY hackathon_g8_one/models/features_selecionadas_rfe.csv /app/models/
 COPY hackathon_g8_one/models/label_encoders_g8.json /app/models/
 
 # Copiar o modelo treinado (quando disponível do time de DS)
-# COPY hackathon_g8_one/models/modelo_churn.joblib /app/models/
+COPY hackathon_g8_one/models/modelo_churn.joblib /app/models/
 
 # Expor a porta 5000
 EXPOSE 5000
