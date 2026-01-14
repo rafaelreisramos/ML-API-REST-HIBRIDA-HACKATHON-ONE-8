@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, gql, useMutation } from '@apollo/client'
 import Analytics from './Analytics'
 import { useAuth } from './context/AuthContext'
@@ -9,7 +9,8 @@ import { fetchWithAuth } from './utils/api'
 const GET_STATS = gql`
   query GetStats {
     listarAnalises {
-      riscoAlto
+        clienteId
+        riscoAlto
     }
   }
 `
@@ -70,6 +71,22 @@ function App() {
     const [uploadStatus, setUploadStatus] = useState("")
     const [batchProgress, setBatchProgress] = useState({ initial: 0, current: 0, isMonitoring: false })
 
+    // Refs para controle de cancelamento
+    const abortControllerRef = useRef<AbortController | null>(null)
+    const progressIntervalRef = useRef<any>(null)
+
+    const cancelUpload = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort()
+        }
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current)
+        }
+        setUploading(false)
+        setUploadStatus("⚠️ Upload cancelado pelo usuário.")
+        setBatchProgress({ initial: 0, current: 0, isMonitoring: false })
+    }
+
     const handleBatchUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return
         const file = e.target.files[0]
@@ -85,7 +102,11 @@ function App() {
         setBatchProgress({ initial: initialCount, current: 0, isMonitoring: true })
 
         // Iniciar polling para monitorar progresso
-        const progressInterval = setInterval(() => {
+        // Configurar AbortController
+        abortControllerRef.current = new AbortController()
+
+        // Iniciar polling para monitorar progresso
+        progressIntervalRef.current = setInterval(() => {
             refetch().then((result) => {
                 const newCount = result.data?.listarAnalises?.length || 0
                 const processed = newCount - initialCount
@@ -98,10 +119,11 @@ function App() {
             // USANDO ENDPOINT OTIMIZADO PARA 50K LINHAS com autenticação do contexto
             const res = await fetchWithAuth('/api/churn/batch/optimized', {
                 method: 'POST',
-                body: data
+                body: data,
+                signal: abortControllerRef.current.signal
             })
 
-            clearInterval(progressInterval) // Parar polling
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
 
             if (res.ok) {
                 const blob = await res.blob()
@@ -119,12 +141,17 @@ function App() {
             } else {
                 setUploadStatus("Erro no servidor. Verifique o formato do CSV.")
             }
-        } catch (err) {
-            clearInterval(progressInterval)
-            setUploadStatus("Erro de conexão ou timeout.")
+        } catch (err: any) {
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+            if (err.name === 'AbortError') {
+                console.log('Upload aborted');
+            } else {
+                setUploadStatus("Erro de conexão ou timeout.")
+            }
         } finally {
             setUploading(false)
             setBatchProgress({ initial: 0, current: 0, isMonitoring: false })
+            abortControllerRef.current = null
         }
     }
 
@@ -142,13 +169,33 @@ function App() {
                     </button>
                     <button className="theme-toggle" style={{ color: 'var(--error)', borderColor: 'var(--error)' }}
                         onClick={async () => {
-                            if (confirm("Limpar TUDO?")) {
-                                await fetch('/api/churn/reset', { method: 'DELETE' });
-                                window.location.href = window.location.origin;
+                            if (confirm("ATENÇÃO: Isso apagará TODOS os dados do banco de dados.\n\nDeseja continuar?")) {
+                                try {
+                                    const res = await fetchWithAuth('/api/churn/reset', { method: 'DELETE' });
+                                    if (res.ok) {
+                                        localStorage.removeItem('apollo-cache-persist');
+                                        alert("Sistema resetado com sucesso!");
+                                        window.location.reload();
+                                    } else if (res.status === 403) {
+                                        alert("⚠️ Acesso Negado (403)\\n\\nO endpoint /reset está bloqueado.\\nContate o administrador do backend.");
+                                        console.error("Reset endpoint forbidden (403). Check SecurityConfig.java");
+                                    } else {
+                                        alert("Erro ao resetar: " + res.statusText);
+                                        console.error("Reset failed", res);
+                                    }
+                                } catch (e) {
+                                    alert("Erro de conexão ao tentar resetar.");
+                                    console.error(e);
+                                }
                             }
                         }}>
                         Reset
                     </button>
+                    {isAuthenticated && (
+                        <button className="theme-toggle" onClick={logout} style={{ color: 'var(--text-secondary)' }}>
+                            Sair
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -162,7 +209,7 @@ function App() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>📊 Estatísticas Globais da API</h3>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600', color: 'white' }}>📊 Estatísticas Globais da API</h3>
                     <span style={{
                         background: 'rgba(255,255,255,0.2)',
                         padding: '4px 12px',
@@ -197,22 +244,6 @@ function App() {
                 </div>
             </section>
 
-            {/* KPI Cards */}
-            <section className="grid">
-                <div className="card">
-                    <div className="stat-label">Total Analisado</div>
-                    <div className="stat-value">{statsLoading ? "-" : total}</div>
-                </div>
-                <div className="card">
-                    <div className="stat-label">Alto Risco</div>
-                    <div className="stat-value high-risk">{statsLoading ? "-" : risk}</div>
-                </div>
-                <div className="card">
-                    <div className="stat-label">Taxa de Churn</div>
-                    <div className="stat-value">{statsLoading ? "-" : riskRate}%</div>
-                </div>
-            </section>
-
             {/* Layout Principal - Condicional baseado na aba */}
             {activeTab === 'dashboard' ? (
                 // Layout Full-Screen para Dashboard
@@ -225,72 +256,94 @@ function App() {
                     <Analytics />
                 </div>
             ) : (
-                // Layout Original (2 colunas)
-                <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', alignItems: 'start' }}>
+                // Layout Lovable Structure: Sidebar Fixed (w-80) + Content Liquid (flex-1)
+                <div className="flex gap-6 items-start">
 
-                    {/* Coluna Esquerda: Abas + Conteúdo */}
-                    <div>
+                    {/* Coluna Esquerda: Abas + Conteúdo (W-80 Fixed) */}
+                    <div className="w-80 flex-shrink-0 flex flex-col gap-4">
                         <div className="tabs">
-                            <button className={`tab-btn ${activeTab === 'simulador' ? 'active' : ''}`} onClick={() => setActiveTab('simulador')}>Simulador Individual</button>
-                            <button className={`tab-btn ${activeTab === 'batch' ? 'active' : ''}`} onClick={() => setActiveTab('batch')}>Processamento Batch</button>
-                            <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📊 Dashboard</button>
+                            <button className={`tab-btn ${activeTab === 'simulador' ? 'active' : ''}`} onClick={() => setActiveTab('simulador')}>Simulador</button>
+                            <button className={`tab-btn ${activeTab === 'batch' ? 'active' : ''}`} onClick={() => setActiveTab('batch')}>Batch</button>
+                            <button className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📊 Dash</button>
                         </div>
 
                         {activeTab === 'simulador' && (
-                            <div className="card">
-                                <h3>Simulador Real-Time</h3>
+                            <div className="card" style={{ padding: '20px' }}>
+                                <h3 style={{ fontSize: '1rem', marginTop: 0 }}>Simulador Real-Time</h3>
                                 <form onSubmit={e => { e.preventDefault(); analyze({ variables: { input: formData } }) }}>
-                                    {/* Form Grid Compacto */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                        <div><label>ID Cliente</label><input value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} /></div>
-                                        <div><label>Idade</label><input type="number" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} /></div>
+                                    {/* Form Grid Compacto - 2 Colunas mas labels menores */}
+                                    {/* Form Grid Compacto - 2 Colunas mas labels menores */}
+                                    <div className="grid-cols-2">
+                                        <div style={{ gridColumn: '1/-1' }}>
+                                            <label className="label-field">ID Cliente</label>
+                                            <input className="input-field" value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} />
+                                        </div>
 
-                                        <div><label>Gênero</label>
-                                            <select value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
+                                        <div>
+                                            <label className="label-field">Idade</label>
+                                            <input className="input-field" type="number" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} />
+                                        </div>
+
+                                        <div>
+                                            <label className="label-field">Gênero</label>
+                                            <select className="input-field" value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
                                                 <option>Masculino</option><option>Feminino</option>
                                             </select>
                                         </div>
-                                        <div><label>Plano</label>
-                                            <select value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
+
+                                        <div>
+                                            <label className="label-field">Plano</label>
+                                            <select className="input-field" value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
                                                 <option value="basico">Básico</option><option value="padrao">Padrão</option><option value="premium">Premium</option>
                                             </select>
                                         </div>
 
-                                        <div><label>Valor Mensal (R$)</label><input type="number" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} /></div>
-                                        <div><label>Meses Assinatura</label><input type="number" value={formData.tempoAssinaturaMeses} onChange={e => setFormData({ ...formData, tempoAssinaturaMeses: +e.target.value })} /></div>
+                                        <div>
+                                            <label className="label-field">Valor (R$)</label>
+                                            <input className="input-field" type="number" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} />
+                                        </div>
 
-                                        {/* V8 Fields */}
-                                        <div style={{ gridColumn: '1/-1', background: 'var(--input-bg)', padding: '10px', borderRadius: '8px', marginTop: '10px' }}>
-                                            <div style={{ fontSize: '0.8rem', fontWeight: '600', marginBottom: '8px', opacity: 0.7 }}>PARÂMETROS V8</div>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                                                <div><label>Contrato</label>
-                                                    <select value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
-                                                        <option>MENSAL</option><option>ANUAL</option>
-                                                    </select>
-                                                </div>
-                                                <div><label>Categoria</label>
-                                                    <select value={formData.categoriaFavorita} onChange={e => setFormData({ ...formData, categoriaFavorita: e.target.value })}>
-                                                        <option>FILMES</option><option>SERIES</option><option>DOCUMENTARIOS</option>
-                                                    </select>
-                                                </div>
-                                                <div><label>Acessibilidade</label>
-                                                    <select value={formData.acessibilidade} onChange={e => setFormData({ ...formData, acessibilidade: +e.target.value })}>
-                                                        <option value={0}>Não</option><option value={1}>Sim</option>
-                                                    </select>
-                                                </div>
+                                        <div>
+                                            <label className="label-field">Meses Assin.</label>
+                                            <input className="input-field" type="number" value={formData.tempoAssinaturaMeses} onChange={e => setFormData({ ...formData, tempoAssinaturaMeses: +e.target.value })} />
+                                        </div>
+
+                                        <div>
+                                            <label className="label-field">Contrato</label>
+                                            <select className="input-field" value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
+                                                <option>MENSAL</option><option>ANUAL</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Opções Avançadas Toggle ou Accordion se necessário, aqui deixamos compacto */}
+                                    {/* Opções Avançadas */}
+                                    <div className="mt-4 pt-4 border-t border-border">
+                                        <div className="grid-cols-2">
+                                            <div>
+                                                <label className="label-field">Categoria</label>
+                                                <select className="input-field" value={formData.categoriaFavorita} onChange={e => setFormData({ ...formData, categoriaFavorita: e.target.value })}>
+                                                    <option>FILMES</option><option>SERIES</option><option>DOCUMENTARIOS</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="label-field">Acessibilidade</label>
+                                                <select className="input-field" value={formData.acessibilidade} onChange={e => setFormData({ ...formData, acessibilidade: +e.target.value })}>
+                                                    <option value={0}>Não</option><option value={1}>Sim</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={simLoading} style={{ marginTop: '20px', width: '100%' }}>
-                                        {simLoading ? "Calculando..." : "Analisar Risco de Churn"}
+                                    <button type="submit" disabled={simLoading} className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-xl mt-4 transition-colors">
+                                        {simLoading ? "Calculando..." : "Analisar Risco"}
                                     </button>
                                 </form>
 
                                 {simData?.registrarAnalise && (
-                                    <div className={`result-box ${simData.registrarAnalise.riscoAlto ? 'result-risk' : 'result-safe'}`}>
-                                        <div style={{ fontSize: '2rem', fontWeight: '700' }}>{(simData.registrarAnalise.probabilidade * 100).toFixed(1)}%</div>
-                                        <div>{simData.registrarAnalise.previsao}</div>
+                                    <div className={`result-box ${simData.registrarAnalise.riscoAlto ? 'result-risk' : 'result-safe'}`} style={{ marginTop: '15px', padding: '15px' }}>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>{(simData.registrarAnalise.probabilidade * 100).toFixed(1)}%</div>
+                                        <div style={{ fontSize: '0.9rem' }}>{simData.registrarAnalise.previsao}</div>
                                     </div>
                                 )}
                             </div>
@@ -304,62 +357,87 @@ function App() {
                                     O sistema utiliza paralelismo para inferência rápida.
                                 </p>
 
-                                <label className="upload-area" style={{ height: '220px', cursor: uploading ? 'wait' : 'pointer' }}>
-                                    <input type="file" accept=".csv" hidden onChange={handleBatchUpload} disabled={uploading} />
-                                    <div style={{ textAlign: 'center', width: '100%' }}>
-                                        {!uploading ? (
-                                            <>
-                                                <div style={{ fontSize: '3rem', marginBottom: '10px' }}>📂</div>
-                                                <div style={{ fontWeight: '600', fontSize: '1.1rem' }}>
-                                                    Carregar CSV (Drag & Drop)
-                                                </div>
-                                                <div style={{ marginTop: '8px', color: 'var(--text-secondary)' }}>
-                                                    {uploadStatus || "Suporta arquivos padrão V8 (até 50k linhas)"}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="loading-spinner" style={{ margin: '0 auto 15px' }}></div>
-                                                <div style={{ fontWeight: '600', fontSize: '1.2rem', marginBottom: '5px' }}>
-                                                    Processando Lote...
-                                                </div>
-                                                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--accent)' }}>
-                                                    {batchProgress.current.toLocaleString()}
-                                                </div>
-                                                <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                                    registros analisados em tempo real
-                                                </div>
-                                                {/* Visual Progress Bar (Indeterminate) */}
-                                                <div style={{
-                                                    width: '200px',
-                                                    height: '6px',
-                                                    background: 'rgba(255,255,255,0.1)',
-                                                    borderRadius: '3px',
-                                                    margin: '15px auto 0',
-                                                    overflow: 'hidden',
-                                                    position: 'relative'
-                                                }}>
-                                                    <div style={{
-                                                        position: 'absolute',
-                                                        left: 0,
-                                                        top: 0,
-                                                        height: '100%',
-                                                        width: '50%',
-                                                        background: 'var(--accent)',
-                                                        borderRadius: '3px',
-                                                        animation: 'indeterminate 1.5s infinite linear'
-                                                    }}></div>
-                                                </div>
-                                                <style>{`
-                                                    @keyframes indeterminate {
-                                                        0% { left: -50%; }
-                                                        100% { left: 100%; }
-                                                    }
-                                                `}</style>
-                                            </>
-                                        )}
+                                {!uploading ? (
+                                    <label className="upload-area" style={{ height: '220px', cursor: 'pointer' }}>
+                                        <input type="file" accept=".csv" hidden onChange={handleBatchUpload} disabled={uploading} />
+                                        <div style={{ textAlign: 'center', width: '100%' }}>
+                                            <div style={{ fontSize: '3rem', marginBottom: '10px' }}>📂</div>
+                                            <div style={{ fontWeight: '600', fontSize: '1.1rem' }}>
+                                                Carregar CSV (Drag & Drop)
+                                            </div>
+                                            <div style={{ marginTop: '8px', color: 'var(--text-secondary)' }}>
+                                                {uploadStatus || "Suporta arquivos padrão V8 (até 50k linhas)"}
+                                            </div>
+                                        </div>
+                                    </label>
+                                ) : (
+                                    <div className="upload-area" style={{ height: '220px', cursor: 'default', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div className="loading-spinner" style={{ margin: '0 auto 15px' }}></div>
+                                        <div style={{ fontWeight: '600', fontSize: '1.2rem', marginBottom: '5px' }}>
+                                            Processando Lote...
+                                        </div>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--accent)' }}>
+                                            {batchProgress.current.toLocaleString()}
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                                            registros analisados em tempo real
+                                        </div>
+                                        {/* Visual Progress Bar (Indeterminate) */}
+                                        <div style={{
+                                            width: '200px',
+                                            height: '6px',
+                                            background: 'rgba(255,255,255,0.1)',
+                                            borderRadius: '3px',
+                                            margin: '15px auto 0',
+                                            overflow: 'hidden',
+                                            position: 'relative'
+                                        }}>
+                                            <div style={{
+                                                position: 'absolute',
+                                                left: 0,
+                                                top: 0,
+                                                height: '100%',
+                                                width: '50%',
+                                                background: 'var(--accent)',
+                                                borderRadius: '3px',
+                                                animation: 'indeterminate 1.5s infinite linear'
+                                            }}></div>
+                                        </div>
+                                        <style>{`
+                                            @keyframes indeterminate {
+                                                0% { left: -50%; }
+                                                100% { left: 100%; }
+                                            }
+                                        `}</style>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                cancelUpload();
+                                            }}
+                                            style={{
+                                                marginTop: '20px',
+                                                padding: '8px 16px',
+                                                background: 'rgba(239, 68, 68, 0.15)',
+                                                color: '#ef4444',
+                                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                borderRadius: '6px',
+                                                cursor: 'pointer',
+                                                fontSize: '0.9rem',
+                                                fontWeight: '600',
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'}
+                                        >
+                                            🛑 Cancelar Operação
+                                        </button>
                                     </div>
-                                </label>
+                                )}
 
                                 <div style={{ marginTop: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                                     * O endpoint <code>/batch/optimized</code> será usado.
@@ -368,9 +446,25 @@ function App() {
                         )}
                     </div>
 
-                    {/* Coluna Direita: Analytics */}
-                    <div>
-                        <Analytics />
+                    {/* Coluna Direita: Conteúdo Principal (Liquid) Container */}
+                    <div className="flex-1 min-w-0">
+                        {activeTab === 'dashboard' ? (
+                            <Analytics />
+                        ) : (
+                            // Modo "Slim" / Resumo quando usando outra ferramenta
+                            <div className="card p-6 h-full border-border">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h3 className="m-0 text-lg font-semibold">Monitoramento</h3>
+                                        <p className="text-sm text-muted-foreground">Acompanhe os resultados em tempo real.</p>
+                                    </div>
+                                    <button className="text-sm text-accent hover:underline cursor-pointer bg-transparent border-0" onClick={() => setActiveTab('dashboard')}>
+                                        Expandir 📊
+                                    </button>
+                                </div>
+                                <Analytics slim={true} />
+                            </div>
+                        )}
                     </div>
 
                 </div>

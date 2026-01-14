@@ -43,40 +43,52 @@ interface ChurnData {
     modeloUsado: string
 }
 
-// Processamento de dados (Power Query simulado)
+// Processamento de dados (Deduplicação e Cálculos)
 const processData = (rawData: ChurnData[]) => {
-    // KPIs
-    const totalClientes = rawData.length
-    const clientesRisco = rawData.filter(c => c.riscoAlto).length
-    const taxaChurn = totalClientes > 0 ? (rawData.reduce((acc, c) => acc + c.probabilidade, 0) / totalClientes) * 100 : 0
-    const ticketMedio = totalClientes > 0 ? rawData.reduce((acc, c) => acc + c.valorMensal, 0) / totalClientes : 0
-    const npsMedia = totalClientes > 0 ? rawData.reduce((acc, c) => acc + c.avaliacaoPlataforma, 0) / totalClientes : 0
+    // 1. Deduplicação por Cliente ID (Regra de Negócio: Visão de Clientes Únicos)
+    // Utilizamos um Map para garantir que cada ID seja contado apenas uma vez.
+    // Se houver duplicatas, o último registro processado prevalece.
+    const uniqueClientsMap = new Map<string, ChurnData>();
+    rawData.forEach(client => {
+        uniqueClientsMap.set(client.clienteId, client);
+    });
+
+    // Dataset limpo apenas com clientes únicos
+    const data = Array.from(uniqueClientsMap.values());
+
+    // KPIs Baseados em Clientes Únicos
+    const totalClientes = data.length
+    const clientesRisco = data.filter(c => c.riscoAlto).length
+    const clientesRiscoMedio = data.filter(c => c.probabilidade >= 0.20 && c.probabilidade < 0.43).length
+    const taxaChurn = totalClientes > 0 ? (data.reduce((acc, c) => acc + c.probabilidade, 0) / totalClientes) * 100 : 0
+    const ticketMedio = totalClientes > 0 ? data.reduce((acc, c) => acc + c.valorMensal, 0) / totalClientes : 0
+    const npsMedia = totalClientes > 0 ? data.reduce((acc, c) => acc + c.avaliacaoPlataforma, 0) / totalClientes : 0
 
     // Distribuição por Região
-    const porRegiao = rawData.reduce((acc, c) => {
+    const porRegiao = data.reduce((acc, c) => {
         acc[c.regiao] = (acc[c.regiao] || 0) + 1
         return acc
     }, {} as Record<string, number>)
 
     // Distribuição por Plano
-    const porPlano = rawData.reduce((acc, c) => {
+    const porPlano = data.reduce((acc, c) => {
         acc[c.planoAssinatura] = (acc[c.planoAssinatura] || 0) + 1
         return acc
     }, {} as Record<string, number>)
 
     // Top 10 em Risco
-    const topRisco = [...rawData]
+    const topRisco = [...data]
         .sort((a, b) => b.probabilidade - a.probabilidade)
         .slice(0, 10)
 
     // Churn por Região
     const churnPorRegiao = Object.entries(porRegiao).map(([regiao, total]) => {
-        const emRisco = rawData.filter(c => c.regiao === regiao && c.riscoAlto).length
+        const emRisco = data.filter(c => c.regiao === regiao && c.riscoAlto).length
         return { regiao, total, emRisco, taxa: (emRisco / total) * 100 }
     }).sort((a, b) => b.taxa - a.taxa)
 
     return {
-        kpis: { totalClientes, clientesRisco, taxaChurn, ticketMedio, npsMedia },
+        kpis: { totalClientes, clientesRisco, clientesRiscoMedio, taxaChurn, ticketMedio, npsMedia },
         porRegiao,
         porPlano,
         topRisco,
@@ -84,123 +96,149 @@ const processData = (rawData: ChurnData[]) => {
     }
 }
 
-export default function Analytics() {
+export default function Analytics({ slim = false }: { slim?: boolean }) {
     const { data, loading } = useQuery(GET_ANALYTICS_DATA, { pollInterval: 0 })
 
     if (loading) return (
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div className="flex flex-col items-center justify-center p-6 min-h-[400px]">
             <div className="loading-spinner"></div>
-            <p style={{ marginTop: '15px', color: 'var(--text-secondary)' }}>Carregando dashboard...</p>
+            <p className="mt-4 text-muted-foreground animate-pulse">Carregando dashboard...</p>
         </div>
     )
 
     if (!data?.listarAnalises || data.listarAnalises.length === 0) {
-        return <div className="card"><h3>📊 Dashboard Analytics</h3><p>Sem dados para análise. Execute algumas previsões primeiro.</p></div>
+        return <div className="card p-6"><h3>📊 Dashboard Analytics</h3><p className="text-muted-foreground">Sem dados para análise. Execute algumas previsões primeiro.</p></div>
     }
 
     const analytics = processData(data.listarAnalises)
     const { kpis, porPlano, topRisco, churnPorRegiao } = analytics
 
-    // Cores do tema
-    const colors = {
-        primary: '#10b981',
-        danger: '#ef4444',
-        warning: '#f59e0b',
-        info: '#3b82f6',
-        dark: '#1f2937',
-        darker: '#111827'
-    }
+    // Cores (CSS Variables controlam agora, mas mantemos refs para gráficos JS)
+    const chartColors = ['#34c759', '#5ac8fa', '#ff9500', '#ff3b30']
 
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: '100%' }}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0 }}>📊 Dashboard Analytics</h3>
-                <span style={{
-                    background: colors.primary,
-                    color: 'white',
-                    padding: '4px 12px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: '700'
-                }}>LIVE</span>
-            </div>
-
-            {/* KPI Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
-                {/* Total Clientes */}
-                <div className="card" style={{ background: `linear-gradient(135deg, ${colors.info} 0%, ${colors.info}dd 100%)`, color: 'white', padding: '20px' }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '8px' }}>TOTAL ANALISADOS</div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800' }}>{kpis.totalClientes.toLocaleString()}</div>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '4px' }}>clientes</div>
-                </div>
-
-                {/* Taxa de Churn */}
-                <div className="card" style={{ background: `linear-gradient(135deg, ${colors.warning} 0%, ${colors.warning}dd 100%)`, color: 'white', padding: '20px' }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '8px' }}>TAXA DE CHURN</div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800' }}>{kpis.taxaChurn.toFixed(1)}%</div>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '4px' }}>média geral</div>
-                </div>
-
-                {/* Clientes em Risco */}
-                <div className="card" style={{ background: `linear-gradient(135deg, ${colors.danger} 0%, ${colors.danger}dd 100%)`, color: 'white', padding: '20px' }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '8px' }}>ALTO RISCO</div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800' }}>{kpis.clientesRisco.toLocaleString()}</div>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '4px' }}>clientes críticos</div>
-                </div>
-
-                {/* Ticket Médio */}
-                <div className="card" style={{ background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary}dd 100%)`, color: 'white', padding: '20px' }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '8px' }}>TICKET MÉDIO</div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800' }}>R$ {kpis.ticketMedio.toFixed(0)}</div>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '4px' }}>por cliente</div>
-                </div>
-
-                {/* NPS Médio */}
-                <div className="card" style={{ background: `linear-gradient(135deg, ${colors.dark} 0%, ${colors.darker} 100%)`, color: 'white', padding: '20px' }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '8px' }}>NPS MÉDIO</div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800' }}>{kpis.npsMedia.toFixed(1)}</div>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginTop: '4px' }}>satisfação</div>
-                </div>
-            </div>
-
-            {/* Charts Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', flex: 1 }}>
-                {/* Gráfico de Pizza - Distribuição por Plano */}
-                <div className="card" style={{ padding: '20px' }}>
-                    <h4 style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>DISTRIBUIÇÃO POR PLANO</h4>
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-                        {Object.keys(porPlano).length > 0 ? (
-                            <PieChart data={porPlano} colors={[colors.primary, colors.info, colors.warning]} />
-                        ) : (
-                            <p style={{ color: 'var(--text-secondary)' }}>Sem dados</p>
-                        )}
+    // Se estiver em modo slim (sidebar), mostramo apenas KPIs resumidos empilhados ou grid menor
+    if (slim) {
+        return (
+            <div className="flex flex-col gap-4 h-full overflow-y-auto">
+                {/* KPIs Compactos */}
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="card p-4 bg-accent/10 border-accent/20">
+                        <div className="text-xs font-semibold text-accent uppercase">Total</div>
+                        <div className="text-xl font-bold">{kpis.totalClientes}</div>
+                    </div>
+                    <div className="card p-4 bg-warning/10 border-warning/20">
+                        <div className="text-xs font-semibold text-warning uppercase">Churn</div>
+                        <div className="text-xl font-bold">{kpis.taxaChurn.toFixed(1)}%</div>
                     </div>
                 </div>
 
-                {/* Ranking de Risco */}
-                <div className="card" style={{ padding: '20px', maxHeight: '300px', overflowY: 'auto' }}>
-                    <h4 style={{ margin: '0 0 15px 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>TOP 10 CLIENTES EM RISCO</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Lista Simplificada de Risco */}
+                <div className="flex-1">
+                    <h4 className="text-sm font-semibold mb-3">Top Risco</h4>
+                    <div className="flex flex-col gap-2">
+                        {topRisco.slice(0, 5).map((c, i) => (
+                            <div key={i} className="flex justify-between items-center text-sm p-2 bg-input-bg rounded-lg">
+                                <span className="font-mono text-xs">{c.clienteId}</span>
+                                <span className="font-bold text-danger">{(c.probabilidade * 100).toFixed(0)}%</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Modo Full Dashboard (Grid Lovable)
+    return (
+        <div className="flex flex-col gap-6 h-full">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <span className="text-lg font-semibold">📊 Dashboard Analytics</span>
+                </div>
+                <span className="bg-success/10 text-success border border-success/20 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                    LIVE
+                </span>
+            </div>
+
+            {/* KPI Cards Grid (6 colunas) */}
+            <div className="grid-cols-6">
+                {/* Total */}
+                <div className="card p-4 border-l-4 border-l-accent">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Total Analisados</div>
+                    <div className="text-2xl font-bold">{kpis.totalClientes.toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">clientes</div>
+                </div>
+
+                {/* Churn */}
+                <div className="card p-4 border-l-4 border-l-warning">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Taxa de Churn</div>
+                    <div className="text-2xl font-bold text-warning">{kpis.taxaChurn.toFixed(1)}%</div>
+                    <div className="text-xs text-muted-foreground mt-1">média geral</div>
+                </div>
+
+                {/* Risco Médio */}
+                <div className="card p-4 border-l-4 border-l-warning" style={{ borderLeftColor: '#ff9500' }}>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Risco Médio</div>
+                    <div className="text-2xl font-bold" style={{ color: '#ff9500' }}>{kpis.clientesRiscoMedio.toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">atenção necessária</div>
+                </div>
+
+                {/* Risco */}
+                <div className="card p-4 border-l-4 border-l-danger">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Alto Risco</div>
+                    <div className="text-2xl font-bold text-danger">{kpis.clientesRisco.toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground mt-1">clientes críticos</div>
+                </div>
+
+                {/* Ticket */}
+                <div className="card p-4 border-l-4 border-l-success">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Ticket Médio</div>
+                    <div className="text-2xl font-bold text-success">R$ {kpis.ticketMedio.toFixed(0)}</div>
+                    <div className="text-xs text-muted-foreground mt-1">por cliente</div>
+                </div>
+
+                {/* NPS */}
+                <div className="card p-4 border-l-4 border-l-dark">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">NPS Médio</div>
+                    <div className="text-2xl font-bold text-foreground">{kpis.npsMedia.toFixed(1)}</div>
+                    <div className="text-xs text-muted-foreground mt-1">satisfação</div>
+                </div>
+            </div>
+
+            {/* Charts Row (2 colunas) */}
+            <div className="grid-cols-2 gap-6 flex-1 min-h-0">
+                {/* Pizza */}
+                <div className="card p-6 flex flex-col items-center justify-center">
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-6 uppercase tracking-wider self-start">Distribuição por Plano</h4>
+                    {Object.keys(porPlano).length > 0 ? (
+                        <PieChart data={porPlano} colors={chartColors} />
+                    ) : (
+                        <p className="text-muted-foreground">Sem dados</p>
+                    )}
+                </div>
+
+                {/* Lista de Risco */}
+                <div className="card p-6 flex flex-col overflow-hidden">
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Top 10 Clientes em Risco</h4>
+                    <div className="flex-col gap-2 overflow-y-auto pr-2">
                         {topRisco.map((cliente, i) => (
-                            <div key={i} style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '10px',
-                                background: 'var(--bg-app)',
-                                borderRadius: '8px',
-                                borderLeft: `3px solid ${cliente.probabilidade > 0.7 ? colors.danger : colors.warning}`
-                            }}>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>{cliente.clienteId}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{cliente.planoAssinatura}</div>
+                            <div key={i} className="flex justify-between items-center p-3 bg-bg-app rounded-lg border-l-4"
+                                style={{ borderLeftColor: cliente.probabilidade > 0.7 ? '#ff3b30' : '#ff9500' }}>
+                                <div>
+                                    <div className="text-sm font-semibold flex items-center gap-2">
+                                        {cliente.clienteId}
+                                        <span className="text-[10px] bg-input-bg border border-border px-1.5 py-0.5 rounded text-muted-foreground uppercase tracking-wider">
+                                            {cliente.modeloUsado || 'AI'}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground uppercase">{cliente.planoAssinatura}</div>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: colors.danger }}>
+                                <div className="text-right">
+                                    <div className="font-bold text-danger">
                                         {(cliente.probabilidade * 100).toFixed(1)}%
                                     </div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                    <div className="text-xs text-muted-foreground">
                                         R$ {cliente.valorMensal.toFixed(0)}
                                     </div>
                                 </div>
@@ -208,35 +246,30 @@ export default function Analytics() {
                         ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Churn por Região - Barras Horizontais */}
-                <div className="card" style={{ padding: '20px', gridColumn: '1 / -1' }}>
-                    <h4 style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>CHURN POR REGIÃO</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {churnPorRegiao.map((item, i) => (
-                            <div key={i}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{item.regiao}</span>
-                                    <span style={{ fontSize: '0.85rem', color: colors.danger, fontWeight: '700' }}>
-                                        {item.emRisco} / {item.total} ({item.taxa.toFixed(1)}%)
-                                    </span>
-                                </div>
-                                <div style={{
-                                    height: '8px',
-                                    background: 'var(--input-bg)',
-                                    borderRadius: '4px',
-                                    overflow: 'hidden'
-                                }}>
-                                    <div style={{
-                                        height: '100%',
+            {/* Tabela Região (Full Width) */}
+            <div className="card p-6">
+                <h4 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Churn por Região</h4>
+                <div className="flex flex-col gap-3">
+                    {churnPorRegiao.map((item, i) => (
+                        <div key={i}>
+                            <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium">{item.regiao}</span>
+                                <span className="text-sm font-bold text-muted-foreground">
+                                    {item.emRisco} / {item.total} <span className={item.taxa > 0 ? 'text-danger' : 'text-success'}>({item.taxa.toFixed(1)}%)</span>
+                                </span>
+                            </div>
+                            <div className="h-2 w-full bg-input-bg rounded-full overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-1000 ease-out"
+                                    style={{
                                         width: `${item.taxa}%`,
-                                        background: `linear-gradient(90deg, ${colors.warning}, ${colors.danger})`,
-                                        transition: 'width 1s ease-out'
-                                    }}></div>
+                                        background: 'linear-gradient(90deg, #ff9500, #ff3b30)'
+                                    }}>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
