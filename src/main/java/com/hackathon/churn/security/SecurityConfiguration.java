@@ -27,9 +27,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/login").permitAll();
                     req.requestMatchers("/usuarios").permitAll();
-                    req.requestMatchers("/graphiql").permitAll();
-                    req.requestMatchers("/graphql").permitAll(); // Liberado no Spring Security, validado via
-                                                                 // Token/Contexto
+                    req.requestMatchers("/actuator/health").permitAll(); // Health check seguro do Docker
+                    req.requestMatchers("/graphiql").permitAll(); // Interface visual (opcional)
+                    req.requestMatchers("/graphql").permitAll(); // Liberado para garantir funcionamento
                     req.anyRequest().authenticated();
 
                 })

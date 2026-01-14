@@ -17,6 +17,16 @@ export default defineConfig({
                 target: 'http://localhost:9999',
                 changeOrigin: true,
                 secure: false
+            },
+            '/login': {
+                target: 'http://localhost:9999',
+                changeOrigin: true,
+                secure: false
+            },
+            '/usuarios': {
+                target: 'http://localhost:9999',
+                changeOrigin: true,
+                secure: false
             }
         }
     }

@@ -95,7 +95,7 @@ public class ChurnBatchService {
      * Salva resultados em lotes para melhor performance.
      */
     private void salvarEmLote(List<ChurnData> resultados, int totalClientes) {
-        System.out.println("💾 Salvando " + resultados.size() + " resultados no MongoDB (bulk insert)...");
+        System.out.println("💾 Salvando " + resultados.size() + " resultados no Banco de Dados (bulk insert)...");
         int saved = 0;
 
         for (int i = 0; i < resultados.size(); i += BULK_INSERT_SIZE) {

@@ -59,7 +59,8 @@ const processData = (rawData: ChurnData[]) => {
     // KPIs Baseados em Clientes Únicos
     const totalClientes = data.length
     const clientesRisco = data.filter(c => c.riscoAlto).length
-    const clientesRiscoMedio = data.filter(c => c.probabilidade >= 0.20 && c.probabilidade < 0.43).length
+    // Risco Médio: Probabilidade >= 25% mas ainda não classificado como Alto Risco pelo modelo
+    const clientesRiscoMedio = data.filter(c => !c.riscoAlto && c.probabilidade >= 0.25).length
     const taxaChurn = totalClientes > 0 ? (data.reduce((acc, c) => acc + c.probabilidade, 0) / totalClientes) * 100 : 0
     const ticketMedio = totalClientes > 0 ? data.reduce((acc, c) => acc + c.valorMensal, 0) / totalClientes : 0
     const npsMedia = totalClientes > 0 ? data.reduce((acc, c) => acc + c.avaliacaoPlataforma, 0) / totalClientes : 0
