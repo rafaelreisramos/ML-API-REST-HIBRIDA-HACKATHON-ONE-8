@@ -1,121 +1,95 @@
-# 🔮 ChurnInsight: Inteligência Preditiva de Cancelamento
+# 📊 ChurnInsight: Monitoramento de Risco de Cancelamento
 
-> **Plataforma Híbrida (Java + Python + React) para detecção de risco de Churn em tempo real.**
->
-> *Versão Final v1.0 (Hackathon Alura G8)*
+> **Sistema Híbrido de Inteligência Artificial para Previsão de Churn**
+> *Hackathon Alura G8 - Versão Final*
 
-![Status](https://img.shields.io/badge/Status-Production_Ready-green)
+![Status](https://img.shields.io/badge/Status-Stable-green)
 ![Docker](https://img.shields.io/badge/Docker-Zero_Config-blue)
-![AI](https://img.shields.io/badge/AI_Model-RandomForest_G8-purple)
-![Java](https://img.shields.io/badge/Backend-Java_Spring-orange)
-![React](https://img.shields.io/badge/Frontend-React_Vite-cyan)
+![Stack](https://img.shields.io/badge/Stack-Java_Python_React-orange)
 
 ---
 
-## 🏗️ Arquitetura do Projeto
+## 🚀 Como Rodar o Projeto
 
-O sistema opera sobre uma arquitetura de microserviços otimizada para deployment rápido e resiliência:
+O projeto foi desenhado para **Zero Configuração**. Basta ter o Docker instalado.
 
-```mermaid
-graph TD
-    User[Usuário] -->|Acessa via HTTP| Frontend[Frontend React (Porta 80)]
-    Frontend -->|GraphQL Query| Backend[Backend Java API (Porta 9999)]
-    Backend -->|REST POST /predict| AIService[AI Service Python (Porta 5000)]
-    
-    subgraph "AI Core (Python)"
-    AIService -->|Carrega| Model[RandomForest Model G8]
-    AIService -->|Feature Engineering| Preproc[Processing.py]
-    AIService -->|Auto-Healing| Rebuild[Rebuild Logic]
-    end
-    
-    subgraph "Backend Core (Java)"
-    Backend -->|Lê/Escreve| H2[H2 Database (Arquivo Local)]
-    Backend -->|Autenticação| Security[Spring Security JWT]
-    end
-```
-
----
-
-## 🚀 Como Rodar (Zero Config)
-
-### Pré-requisitos
-
-* **Docker** e **Docker Compose** instalados.
-
-### Passo 1: Clonar e Iniciar
-
-Este projeto é "Battery Included". O comando abaixo sobe Backend, Frontend e AI Service, além de configurar o banco de dados.
+### 1. Clonar o Repositório
 
 ```bash
 git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
 cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
+```
 
-# Iniciar todo o stack
+### 2. Iniciar os Serviços
+
+Execute o comando abaixo e aguarde alguns minutos até que todos os serviços levantem (especialmente o backend Java):
+
+```bash
 docker-compose up --build
 ```
 
-*Aguarde alguns minutos. O Backend Java demora um pouco para inicializar completamente.*
+### 3. Acessar o Sistema
 
-### Passo 2: Acessar o Sistema
+| Serviço | URL | Descrição |
+|---------|-----|-----------|
+| **Dashboard (Frontend)** | [http://localhost:80](http://localhost:80) | Interface principal para análise de dados. |
+| **API GraphQL** | [http://localhost:9999/graphiql](http://localhost:9999/graphiql) | Playground para consultas diretas ao Backend. |
+| **AI Docs** | [http://localhost:5000/docs](http://localhost:5000/docs) | Documentação técnica do modelo de ML. |
 
-* **Dashboard (UI):** [http://localhost:80](http://localhost:80) (ou porta 3000 se 80 estiver ocupada)
-* **GraphQL API:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
-* **AI Documentation:** [http://localhost:5000/docs](http://localhost:5000/docs)
-
-**🔐 Credenciais Padrão:**
+🔐 **Credenciais de Acesso:**
 
 * **Login:** `admin`
 * **Senha:** `123`
 
 ---
 
-## 🧠 Inteligência Artificial (Modelo G8)
+## 🏗️ Arquitetura Técnica
 
-O sistema utiliza um modelo **RandomForest** customizado para prever o cancelamento de assinatura:
+O sistema opera com três microserviços integrados via Docker:
 
-1. **Features Híbridas:** O sistema aceita dados brutos (CamelCase) e os normaliza automaticamente para o formato de treino (SnakeCase), aplicando feature engineering e RFE (Recursive Feature Elimination).
-2. **Definição de Risco:**
-   * **🔴 Alto Risco:** Probabilidade > **42.87%** (Threshold Otimizado).
-   * **🟠 Risco Médio:** Probabilidade entre **25%** e **42.87%**.
-   * **🟢 Baixo Risco:** Probabilidade < **25%**.
-3. **Auto-Healing:** O container `ai-service` é capaz de reconstruir o modelo binário (`.joblib`) a partir dos dados de treino originais (`X_train.csv`) caso o arquivo do modelo seja corrompido ou perdido.
-
----
-
-## 🛠️ Stack Tecnológico
-
-| Camada | Tecnologia | Destaques |
-|--------|------------|-----------|
-| **Frontend** | React, Vite | Dashboard responsivo, Grid Layout 6-col, TailwindCSS + StyledComponents. |
-| **Backend** | Java 17, Spring Boot 3 | API GraphQL, Spring Security, H2 Database, RestTemplate. |
-| **AI Service** | Python 3.11, FastAPI | Scikit-learn 1.7.1, Pandas, Joblib. Serialização robusta. |
-| **DevOps** | Docker Compose | Multi-stage builds, redes isoladas, volumes persistentes. |
-
----
-
-## 📂 Estrutura de Diretórios
-
-```
-/
-├── ai_service/          # Microserviço Python (FastAPI + Modelos + Treinamento)
-├── src/                 # Código Fonte Java (Spring Boot Backend)
-├── frontend/            # Aplicação React (Vite)
-├── hackathon_g8_one/    # Artefatos Originais de Data Science
-├── docker-compose.yml   # Definição dos Serviços
-└── Dockerfile.backend   # Descritor de Build Java
+```mermaid
+graph TD
+    User["Usuário"] -->|Acessa via HTTP| UI["Frontend React (Porta 80)"]
+    UI -->|"GraphQL Query"| API["Backend Java API (Porta 9999)"]
+    API -->|"REST POST /predict"| AI["AI Service Python (Porta 5000)"]
+    
+    subgraph "AI Core (Python)"
+    AI -->|"Carrega"| Model["Modelo RandomForest G8"]
+    AI -->|"Auto-Healing"| Rebuild["Rebuild Logic"]
+    end
+    
+    subgraph "Backend Core (Java)"
+    API -->|"Persiste"| H2["H2 Database (Arquivo Local)"]
+    end
 ```
 
----
-
-## 🧪 Testes e Validação
-
-Para validar a integridade do sistema, incluímos scripts de teste:
-
-```bash
-# Teste de Ponta-a-Ponta (E2E)
-./scripts/run_e2e_tests.sh
-```
+1. **Frontend (React + Vite):** Interface responsiva para upload de CSVs e visualização de dashboards.
+2. **Backend (Java 17 Spring Boot):** Gerencia autenticação (JWT), regras de negócio e persistência no banco H2.
+3. **AI Service (Python 3.11):** Executa o modelo de Machine Learning, com funcionalidades de **Auto-Healing** (reconstrução automática do modelo em caso de falha).
 
 ---
 
-**Desenvolvido por:** Equipe G8 Hackathon Alura
+## 🧠 Sobre o Modelo de IA
+
+O sistema utiliza um modelo **RandomForest** treinado para identificar probabilidade de cancelamento.
+
+* **Classificação de Risco:**
+  * 🔴 **Alto Risco:** Probabilidade > **42.87%**
+  * 🟠 **Risco Médio:** Probabilidade entre **25%** e **42.87%**
+  * 🟢 **Baixo Risco:** Probabilidade < **25%**
+
+* **Entrada de Dados:** O sistema normaliza automaticamente arquivos CSV (converte `CamelCase` para `snake_case`), garantindo compatibilidade entre os dados do sistema legado e o modelo de ML.
+
+---
+
+## 📂 Estrutura do Projeto
+
+* `ai_service/`: Código Python, API FastAPI e scripts de treinamento.
+* `src/`: Código Java do Backend Spring Boot.
+* `frontend/`: Código da aplicação React.
+* `hackathon_g8_one/`: Artefatos de Data Science (Notebooks, Datasets originais).
+* `docker-compose.yml`: Orquestração dos containers.
+
+---
+
+**Desenvolvido pela Equipe G8 - Hackathon Alura**
