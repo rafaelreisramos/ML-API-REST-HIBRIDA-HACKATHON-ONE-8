@@ -64,6 +64,15 @@ function App() {
         tipoContrato: "MENSAL", categoriaFavorita: "FILMES", acessibilidade: 0
     })
 
+    // Campos derivados calculados automaticamente (features importantes do modelo)
+    const engajamentoScore = Math.min(100, Math.round(
+        (formData.visualizacoesMes * 2) +
+        (formData.tempoMedioSessaoMin * 0.5) +
+        (formData.avaliacaoConteudoMedia * 10) -
+        (formData.diasUltimoAcesso * 3)
+    ))
+    const visualizacoesPorDia = (formData.visualizacoesMes / 30).toFixed(1)
+
     const [analyze, { data: simData, loading: simLoading }] = useMutation(ANALYZE_SCENARIO, {
         update(cache, { data: { registrarAnalise } }) {
             // Atualizar Cache de Estatísticas Gerais (GET_STATS)
@@ -339,12 +348,29 @@ function App() {
                                             </div>
                                         </div>
 
+                                        {/* Métricas Calculadas (Auto) */}
+                                        <div className="mt-4 pt-3 border-t border-accent/20">
+                                            <div className="text-[10px] font-bold text-accent uppercase tracking-wider mb-2">📊 Métricas Calculadas (IA)</div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="bg-accent/10 rounded px-2 py-1.5">
+                                                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Engajamento</div>
+                                                    <div className="text-sm font-bold text-accent">{engajamentoScore}/100</div>
+                                                </div>
+                                                <div className="bg-accent/10 rounded px-2 py-1.5">
+                                                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Views/Dia</div>
+                                                    <div className="text-sm font-bold text-accent">{visualizacoesPorDia}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         {/* Legenda */}
-                                        <div className="mt-5 pt-2 border-t border-accent/10 text-[10px] text-muted-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 mb-4">
-                                            <span>• T. Sessão: Média minutos/uso</span>
-                                            <span>• Dias Inativo: Sem acessar app</span>
-                                            <span>• Aval. Conteúdo: Nota média</span>
-                                            <span>• Views/Mês: Total assistido</span>
+                                        <div className="mt-3 pt-2 border-t border-accent/10 text-[10px] text-muted-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 mb-4">
+                                            <span>• T. Sessão: Média min/uso (28%)</span>
+                                            <span>• Engajamento: Score IA (26%)</span>
+                                            <span>• Aval. Conteúdo: Último mês (9%)</span>
+                                            <span>• Views/Mês: Total assistido (8%)</span>
+                                            <span>• Views/Dia: Frequência (7%)</span>
+                                            <span>• Dias Inativo: Recência (4%)</span>
                                         </div>
                                     </div>
 
