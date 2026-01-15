@@ -120,7 +120,7 @@ export default function Analytics({ slim = false }: { slim?: boolean }) {
     // Se estiver em modo slim (sidebar), mostramo apenas KPIs resumidos empilhados ou grid menor
     if (slim) {
         return (
-            <div className="flex flex-col gap-4 h-full overflow-y-auto">
+            <div className="flex flex-col gap-6 h-full overflow-y-auto pb-8">
                 {/* KPIs Compactos */}
                 <div className="grid grid-cols-2 gap-3">
                     <div className="card p-4 bg-accent/10 border-accent/20">
@@ -161,7 +161,7 @@ export default function Analytics({ slim = false }: { slim?: boolean }) {
                 </div>
 
                 {/* Mini Churn por Região */}
-                <div className="flex-1 mt-6 border-t border-border pt-4">
+                <div className="flex-1 mt-8 border-t border-border pt-6">
                     <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
                         <span>🌍 Risco Região</span>
                     </h4>
@@ -194,7 +194,7 @@ export default function Analytics({ slim = false }: { slim?: boolean }) {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold">📊 Dashboard Analytics</span>
+                    <span className="text-lg font-semibold text-foreground">📊 Dashboard Analytics</span>
                 </div>
                 <span className="bg-success/10 text-success border border-success/20 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                     LIVE

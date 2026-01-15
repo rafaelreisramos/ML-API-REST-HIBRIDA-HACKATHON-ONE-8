@@ -38,6 +38,7 @@ function App() {
     // 1. Theme & Tabs State
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light')
     const [activeTab, setActiveTab] = useState('simulador')
+    const [showDetails, setShowDetails] = useState(false) // Toggle para detalhes técnicos
 
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme)
@@ -314,14 +315,14 @@ function App() {
                                             {/* Linha 1 */}
                                             <div className="flex flex-col">
                                                 <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">T. Sessão (min)</label>
-                                                <input className="input-field border-accent/30 w-full" type="number"
+                                                <input className="input-field border-accent/30 w-full" type="number" aria-label="Tempo Médio da Sessão (minutos)"
                                                     value={formData.tempoMedioSessaoMin}
                                                     onChange={e => setFormData({ ...formData, tempoMedioSessaoMin: +e.target.value })}
                                                 />
                                             </div>
                                             <div className="flex flex-col">
                                                 <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Dias Inativo</label>
-                                                <input className="input-field border-accent/30 w-full" type="number"
+                                                <input className="input-field border-accent/30 w-full" type="number" aria-label="Dias Inativo"
                                                     value={formData.diasUltimoAcesso}
                                                     onChange={e => setFormData({ ...formData, diasUltimoAcesso: +e.target.value })}
                                                 />
@@ -330,7 +331,7 @@ function App() {
                                             {/* Linha 2 */}
                                             <div className="flex flex-col">
                                                 <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Aval. Conteúdo</label>
-                                                <select className="input-field w-full" value={formData.avaliacaoConteudoUltimoMes}
+                                                <select className="input-field w-full" aria-label="Avaliação do Conteúdo" value={formData.avaliacaoConteudoUltimoMes}
                                                     onChange={e => setFormData({ ...formData, avaliacaoConteudoUltimoMes: +e.target.value, avaliacaoConteudoMedia: +e.target.value })}>
                                                     <option value="1">1 ⭐ (Crítico)</option>
                                                     <option value="2">2 ⭐ (Ruim)</option>
@@ -341,36 +342,52 @@ function App() {
                                             </div>
                                             <div className="flex flex-col">
                                                 <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Views / Mês</label>
-                                                <input className="input-field w-full" type="number"
+                                                <input className="input-field w-full" type="number" aria-label="Visualizações por Mês"
                                                     value={formData.visualizacoesMes}
                                                     onChange={e => setFormData({ ...formData, visualizacoesMes: +e.target.value })}
                                                 />
                                             </div>
                                         </div>
 
-                                        {/* Métricas Calculadas (Auto) */}
-                                        <div className="mt-4 pt-3 border-t border-accent/20">
-                                            <div className="text-[10px] font-bold text-accent uppercase tracking-wider mb-2">📊 Métricas Calculadas (IA)</div>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="bg-accent/10 rounded px-2 py-1.5">
-                                                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Engajamento</div>
-                                                    <div className="text-sm font-bold text-accent">{engajamentoScore}/100</div>
+                                        {/* Métricas Calculadas (Auto) - Collapsible */}
+                                        <div className="mt-4 border-t border-accent/20">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowDetails(!showDetails)}
+                                                className="w-full flex items-center justify-between pt-3 pb-2 focus:outline-none group opacity-80 hover:opacity-100 transition-opacity"
+                                            >
+                                                <div className="text-[10px] font-bold text-primary uppercase tracking-wider flex items-center gap-2">
+                                                    <span>📊 Métricas Calculadas (IA)</span>
                                                 </div>
-                                                <div className="bg-accent/10 rounded px-2 py-1.5">
-                                                    <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Views/Dia</div>
-                                                    <div className="text-sm font-bold text-accent">{visualizacoesPorDia}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                <span className="text-xs text-muted-foreground transform transition-transform duration-200">
+                                                    {showDetails ? '🔽' : '▶️'}
+                                                </span>
+                                            </button>
 
-                                        {/* Legenda */}
-                                        <div className="mt-3 pt-2 border-t border-accent/10 text-[10px] text-muted-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 mb-4">
-                                            <span>• T. Sessão: Média min/uso (28%)</span>
-                                            <span>• Engajamento: Score IA (26%)</span>
-                                            <span>• Aval. Conteúdo: Último mês (9%)</span>
-                                            <span>• Views/Mês: Total assistido (8%)</span>
-                                            <span>• Views/Dia: Frequência (7%)</span>
-                                            <span>• Dias Inativo: Recência (4%)</span>
+                                            {showDetails && (
+                                                <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                                    <div className="grid grid-cols-2 gap-2 mb-4">
+                                                        <div className="bg-accent/10 rounded px-2 py-1.5">
+                                                            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Engajamento</div>
+                                                            <div className="text-sm font-bold text-foreground">{engajamentoScore}/100</div>
+                                                        </div>
+                                                        <div className="bg-accent/10 rounded px-2 py-1.5">
+                                                            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">Views/Dia</div>
+                                                            <div className="text-sm font-bold text-foreground">{visualizacoesPorDia}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Legenda */}
+                                                    <div className="pt-2 border-t border-accent/10 text-[10px] text-muted-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 mb-2">
+                                                        <span>• T. Sessão: Média min/uso (28%)</span>
+                                                        <span>• Engajamento: Score IA (26%)</span>
+                                                        <span>• Aval. Conteúdo: Último mês (9%)</span>
+                                                        <span>• Views/Mês: Total assistido (8%)</span>
+                                                        <span>• Views/Dia: Frequência (7%)</span>
+                                                        <span>• Dias Inativo: Recência (4%)</span>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -380,22 +397,22 @@ function App() {
                                         <div className="grid grid-cols-3 gap-2 text-sm">
                                             <div className="col-span-3">
                                                 <label className="label-field text-xs">ID Cliente</label>
-                                                <input className="input-field py-1 text-xs" value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} />
+                                                <input className="input-field py-1 text-xs" aria-label="ID do Cliente" value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} />
                                             </div>
 
                                             <div>
                                                 <label className="label-field text-xs">Plano</label>
-                                                <select className="input-field py-1 text-xs" value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
+                                                <select className="input-field py-1 text-xs" aria-label="Plano de Assinatura" value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
                                                     <option value="basico">Básico</option><option value="padrao">Padrão</option><option value="premium">Premium</option>
                                                 </select>
                                             </div>
                                             <div>
                                                 <label className="label-field text-xs">Valor</label>
-                                                <input className="input-field py-1 text-xs" type="number" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} />
+                                                <input className="input-field py-1 text-xs" type="number" aria-label="Valor Mensal" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} />
                                             </div>
                                             <div>
                                                 <label className="label-field text-xs">Contrato</label>
-                                                <select className="input-field py-1 text-xs" value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
+                                                <select className="input-field py-1 text-xs" aria-label="Tipo de Contrato" value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
                                                     <option>MENSAL</option><option>ANUAL</option>
                                                 </select>
                                             </div>
@@ -403,11 +420,11 @@ function App() {
                                             {/* Campos Ocultáveis/Menores */}
                                             <div>
                                                 <label className="label-field text-xs">Idade</label>
-                                                <input className="input-field py-1 text-xs" type="number" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} />
+                                                <input className="input-field py-1 text-xs" type="number" aria-label="Idade" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} />
                                             </div>
                                             <div>
                                                 <label className="label-field text-xs">Gênero</label>
-                                                <select className="input-field py-1 text-xs" value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
+                                                <select className="input-field py-1 text-xs" aria-label="Gênero" value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
                                                     <option>Masculino</option><option>Feminino</option>
                                                 </select>
                                             </div>
@@ -538,7 +555,7 @@ function App() {
                             <div className="card p-6 h-full border-border">
                                 <div className="flex justify-between items-center mb-6">
                                     <div>
-                                        <h3 className="m-0 text-lg font-semibold">Monitoramento</h3>
+                                        <h3 className="m-0 text-lg font-semibold text-foreground">Monitoramento</h3>
                                         <p className="text-sm text-muted-foreground">Acompanhe os resultados em tempo real.</p>
                                     </div>
                                     <button className="text-sm text-accent hover:underline cursor-pointer bg-transparent border-0" onClick={() => setActiveTab('dashboard')}>
