@@ -9,37 +9,76 @@
 
 ---
 
-## 🚀 Como Rodar o Projeto
+## 🏁 Guia Passo a Passo (Do Zero)
 
-O projeto foi desenhado para **Zero Configuração**. Basta ter o Docker instalado.
+Este guia foi desenhado para quem acabou de clonar o repositório e quer rodar a aplicação imediatamente.
 
-### 1. Clonar o Repositório
+### 1️⃣ Pré-requisitos
 
-```bash
-git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
-cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
-```
+* **Docker Desktop** instalado e **RODANDO**.
+* (Opcional) Python 3.10+ instalado se quiser rodar os scripts de teste localmente.
 
-### 2. Iniciar os Serviços
+### 2️⃣ Iniciar a Aplicação
 
-Execute o comando abaixo e aguarde alguns minutos até que todos os serviços levantem (especialmente o backend Java):
+Abra o seu terminal na pasta do projeto e execute:
 
 ```bash
-docker-compose up --build
+docker-compose up -d --build
 ```
 
-### 3. Acessar o Sistema
+> **⏳ Aguarde:** O Backend (Java Spring Boot) pode levar de 1 a 2 minutos para iniciar completamente.
 
-| Serviço | URL | Descrição |
-|---------|-----|-----------|
-| **Dashboard (Frontend)** | [http://localhost:80](http://localhost:80) | Interface principal para análise de dados. |
-| **API GraphQL** | [http://localhost:9999/graphiql](http://localhost:9999/graphiql) | Playground para consultas diretas ao Backend. |
-| **AI Docs** | [http://localhost:5000/docs](http://localhost:5000/docs) | Documentação técnica do modelo de ML. |
+Para verificar se tudo subiu corretamente, rode:
 
-🔐 **Credenciais de Acesso:**
+```bash
+docker ps
+```
 
-* **Login:** `admin`
-* **Senha:** `123`
+Você deve ver 3 containers rodando: `frontend-ui`, `backend-api` e `ai-service`.
+
+### 3️⃣ Acessar o Frontend
+
+1. Abra o navegador em: **[http://localhost:3000](http://localhost:3000)** (ou [http://localhost:80](http://localhost:80))
+2. Você verá a tela de Login. Use as credenciais:
+    * **Usuário:** `admin`
+    * **Senha:** `123`
+
+### 4️⃣ Testar a Aplicação
+
+#### 🅰️ Teste Manual (Simulador)
+
+1. No menu lateral, clique em **"Simulador Individual"**.
+2. Preencha os dados do cliente (ou use os valores padrão).
+3. Clique no botão **"Analisar Risco de Churn"**.
+4. O sistema consultará a IA e retornará a probabilidade de cancelamento instantaneamente.
+
+#### 🅱️ Teste Automatizado (Scripts)
+
+O projeto inclui scripts prontos para validar a API e a Inteligência Artificial.
+
+**No Windows (PowerShell):**
+Execute o script que roda todos os testes sequencialmente:
+
+```powershell
+.\run_all_tests.ps1
+```
+
+**Ou execute individualmente (Python):**
+
+```bash
+# Teste de Fluxo Completo (Login -> Mutation -> Query)
+python test_api_e2e.py
+
+# Teste de Processamento em Lote (Batch)
+python test_optimized_batch.py
+```
+
+### 5️⃣ Outros Links Úteis
+
+| Serviço                      | URL                                                              | Descrição                                    |
+| ---------------------------- | ---------------------------------------------------------------- | -------------------------------------------- |
+| **API GraphQL (Playground)** | [http://localhost:9999/graphiql](http://localhost:9999/graphiql) | Para testar queries e mutations diretamente. |
+| **Documentação da IA**       | [http://localhost:5000/docs](http://localhost:5000/docs)         | Swagger da API Python.                       |
 
 ---
 
