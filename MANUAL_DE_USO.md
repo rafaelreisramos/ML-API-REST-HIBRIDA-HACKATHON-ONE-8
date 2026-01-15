@@ -75,9 +75,11 @@ O "cérebro" do ChurnInsight é um modelo **RandomForest** treinado com dados hi
 
 O algoritmo aprendeu padrões complexos, mas alguns fatores pesam mais:
 
-1. **Engajamento Recente:** Se o cliente não loga há mais de 15 dias, o risco sobe exponencialmente.
-2. **Satisfação:** Notas de avaliação de conteúdo abaixo de 3.0 são sinais de alerta.
-3. **Financeiro:** Clientes com mensalidades muito altas sem uso proporcional tendem a cancelar.
+1. **Tempo Médio de Sessão (`tempo_medio_sessao_min`):** Fator mais crítico (28%). Sessões curtas indicam forte desengajamento.
+2. **Engajamento Geral:** Score composto que avalia a interação global do usuário com a plataforma (26%).
+3. **Avaliação de Conteúdo:** Notas baixas recentes têm alto impacto negativo (9%).
+4. **Frequência de Uso:** A quantidade de visualizações mensais e diárias também é determinante.
+5. **Inatividade:** Dias sem acesso ("Recência") continuam sendo um forte indicador de risco.
 
 ### Níveis de Risco
 

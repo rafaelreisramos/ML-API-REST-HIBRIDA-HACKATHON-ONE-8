@@ -137,10 +137,49 @@ export default function Analytics({ slim = false }: { slim?: boolean }) {
                 <div className="flex-1">
                     <h4 className="text-sm font-semibold mb-3">Top Risco</h4>
                     <div className="flex flex-col gap-2">
-                        {topRisco.slice(0, 5).map((c, i) => (
-                            <div key={i} className="flex justify-between items-center text-sm p-2 bg-input-bg rounded-lg">
-                                <span className="font-mono text-xs">{c.clienteId}</span>
-                                <span className="font-bold text-danger">{(c.probabilidade * 100).toFixed(0)}%</span>
+                        {topRisco.slice(0, 5).map((c, i) => {
+                            let riskLabel = "Baixo";
+                            let riskColor = "text-success";
+                            if (c.probabilidade > 0.6) { riskLabel = "CRÍTICO"; riskColor = "text-danger"; }
+                            else if (c.probabilidade > 0.42) { riskLabel = "ALTO"; riskColor = "text-warning"; }
+
+                            return (
+                                <div key={i} className="flex justify-between items-center text-sm p-3 bg-input-bg rounded-lg border-l-4 mb-2"
+                                    style={{ borderLeftColor: c.probabilidade > 0.42 ? (c.probabilidade > 0.6 ? '#ff3b30' : '#ff9500') : '#34c759' }}>
+                                    <div className="flex flex-col overflow-hidden mr-3">
+                                        <span className="font-mono text-xs font-bold truncate pr-2">{c.clienteId}</span>
+                                        <span className="text-[10px] text-muted-foreground uppercase truncate phone:hidden">{c.regiao} • {c.planoAssinatura}</span>
+                                    </div>
+                                    <div className="text-right flex-shrink-0 flex flex-col items-end min-w-[60px]">
+                                        <span className={`font-bold ${riskColor} text-[10px] uppercase tracking-wide mb-0.5 block`}>{riskLabel}</span>
+                                        <span className="font-bold text-sm">{(c.probabilidade * 100).toFixed(1)}%</span>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+
+                {/* Mini Churn por Região */}
+                <div className="flex-1 mt-6 border-t border-border pt-4">
+                    <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                        <span>🌍 Risco Região</span>
+                    </h4>
+                    <div className="flex flex-col gap-4 pr-1">
+                        {churnPorRegiao.map((r, i) => (
+                            <div key={i} className="text-xs">
+                                <div className="flex justify-between items-center mb-1.5 ">
+                                    <span className="font-medium text-muted-foreground">{r.regiao}</span>
+                                    <span className={`font-bold ${r.taxa > 42 ? 'text-danger' : 'text-success'}`}>
+                                        {r.taxa.toFixed(0)}%
+                                    </span>
+                                </div>
+                                <div className="h-2 w-full bg-input-bg rounded-full overflow-hidden border border-border/50">
+                                    <div
+                                        className="h-full rounded-full transition-all duration-500 shadow-sm"
+                                        style={{ width: `${r.taxa}%`, background: r.taxa > 42 ? '#ff3b30' : '#34c759' }}
+                                    ></div>
+                                </div>
                             </div>
                         ))}
                     </div>

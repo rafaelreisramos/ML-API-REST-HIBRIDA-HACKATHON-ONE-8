@@ -64,7 +64,30 @@ function App() {
         tipoContrato: "MENSAL", categoriaFavorita: "FILMES", acessibilidade: 0
     })
 
-    const [analyze, { data: simData, loading: simLoading }] = useMutation(ANALYZE_SCENARIO)
+    const [analyze, { data: simData, loading: simLoading }] = useMutation(ANALYZE_SCENARIO, {
+        update(cache, { data: { registrarAnalise } }) {
+            // Atualizar Cache de Estatísticas Gerais (GET_STATS)
+            try {
+                const existingStats: any = cache.readQuery({ query: GET_STATS });
+                if (existingStats && existingStats.listarAnalises) {
+                    cache.writeQuery({
+                        query: GET_STATS,
+                        data: {
+                            listarAnalises: [...existingStats.listarAnalises, registrarAnalise]
+                        },
+                    });
+                }
+            } catch (e) {
+                // Ignore cache errors if query hasn't run yet
+            }
+
+            // Atualizar Cache Detalhado (GET_ANALYTICS_DATA) - Usado pelo Analytics Component
+            // Precisamos reconstruir o objeto completo pois a mutation retorna apenas alguns campos
+            // Mas para o monitoramento rápido, o update acima já ajuda. O ideal é refetch ou update completo.
+            // Para garantir consistência total "instantânea":
+            refetch(); // Força update da query principal em background
+        }
+    })
 
     // 4. Batch Upload State
     const [uploading, setUploading] = useState(false)
@@ -273,64 +296,98 @@ function App() {
                                 <form onSubmit={e => { e.preventDefault(); analyze({ variables: { input: formData } }) }}>
                                     {/* Form Grid Compacto - 2 Colunas mas labels menores */}
                                     {/* Form Grid Compacto - 2 Colunas mas labels menores */}
-                                    <div className="grid-cols-2">
-                                        <div style={{ gridColumn: '1/-1' }}>
-                                            <label className="label-field">ID Cliente</label>
-                                            <input className="input-field" value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} />
+                                    {/* SEÇÃO 1: FATORES CRÍTICOS (ALTO PESO NA IA) */}
+                                    <div className="bg-accent/5 p-4 rounded-lg border border-accent/20 mb-4">
+                                        <div className="text-xs font-bold text-accent uppercase tracking-wider mb-4 flex items-center gap-2">
+                                            <span>🔥 Fatores de Comportamento (Alto Impacto)</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                            {/* Linha 1 */}
+                                            <div className="flex flex-col">
+                                                <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">T. Sessão (min)</label>
+                                                <input className="input-field border-accent/30 w-full" type="number"
+                                                    value={formData.tempoMedioSessaoMin}
+                                                    onChange={e => setFormData({ ...formData, tempoMedioSessaoMin: +e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Dias Inativo</label>
+                                                <input className="input-field border-accent/30 w-full" type="number"
+                                                    value={formData.diasUltimoAcesso}
+                                                    onChange={e => setFormData({ ...formData, diasUltimoAcesso: +e.target.value })}
+                                                />
+                                            </div>
+
+                                            {/* Linha 2 */}
+                                            <div className="flex flex-col">
+                                                <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Aval. Conteúdo</label>
+                                                <select className="input-field w-full" value={formData.avaliacaoConteudoUltimoMes}
+                                                    onChange={e => setFormData({ ...formData, avaliacaoConteudoUltimoMes: +e.target.value, avaliacaoConteudoMedia: +e.target.value })}>
+                                                    <option value="1">1 ⭐ (Crítico)</option>
+                                                    <option value="2">2 ⭐ (Ruim)</option>
+                                                    <option value="3">3 ⭐ (Médio)</option>
+                                                    <option value="4">4 ⭐ (Bom)</option>
+                                                    <option value="5">5 ⭐ (Excelente)</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="label-field font-semibold text-accent-foreground text-xs whitespace-nowrap mb-1">Views / Mês</label>
+                                                <input className="input-field w-full" type="number"
+                                                    value={formData.visualizacoesMes}
+                                                    onChange={e => setFormData({ ...formData, visualizacoesMes: +e.target.value })}
+                                                />
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <label className="label-field">Idade</label>
-                                            <input className="input-field" type="number" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} />
-                                        </div>
-
-                                        <div>
-                                            <label className="label-field">Gênero</label>
-                                            <select className="input-field" value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
-                                                <option>Masculino</option><option>Feminino</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="label-field">Plano</label>
-                                            <select className="input-field" value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
-                                                <option value="basico">Básico</option><option value="padrao">Padrão</option><option value="premium">Premium</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="label-field">Valor (R$)</label>
-                                            <input className="input-field" type="number" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} />
-                                        </div>
-
-                                        <div>
-                                            <label className="label-field">Meses Assin.</label>
-                                            <input className="input-field" type="number" value={formData.tempoAssinaturaMeses} onChange={e => setFormData({ ...formData, tempoAssinaturaMeses: +e.target.value })} />
-                                        </div>
-
-                                        <div>
-                                            <label className="label-field">Contrato</label>
-                                            <select className="input-field" value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
-                                                <option>MENSAL</option><option>ANUAL</option>
-                                            </select>
+                                        {/* Legenda */}
+                                        <div className="mt-5 pt-2 border-t border-accent/10 text-[10px] text-muted-foreground grid grid-cols-2 gap-x-2 gap-y-0.5 mb-4">
+                                            <span>• T. Sessão: Média minutos/uso</span>
+                                            <span>• Dias Inativo: Sem acessar app</span>
+                                            <span>• Aval. Conteúdo: Nota média</span>
+                                            <span>• Views/Mês: Total assistido</span>
                                         </div>
                                     </div>
 
-                                    {/* Opções Avançadas Toggle ou Accordion se necessário, aqui deixamos compacto */}
-                                    {/* Opções Avançadas */}
-                                    <div className="mt-4 pt-4 border-t border-border">
-                                        <div className="grid-cols-2">
+                                    {/* SEÇÃO 2: DADOS CADASTRAIS (BAIXO PESO) */}
+                                    <div className="opacity-80">
+                                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Dados Cadastrais (Secundário)</div>
+                                        <div className="grid grid-cols-3 gap-2 text-sm">
+                                            <div className="col-span-3">
+                                                <label className="label-field text-xs">ID Cliente</label>
+                                                <input className="input-field py-1 text-xs" value={formData.clienteId} onChange={e => setFormData({ ...formData, clienteId: e.target.value })} />
+                                            </div>
+
                                             <div>
-                                                <label className="label-field">Categoria</label>
-                                                <select className="input-field" value={formData.categoriaFavorita} onChange={e => setFormData({ ...formData, categoriaFavorita: e.target.value })}>
-                                                    <option>FILMES</option><option>SERIES</option><option>DOCUMENTARIOS</option>
+                                                <label className="label-field text-xs">Plano</label>
+                                                <select className="input-field py-1 text-xs" value={formData.planoAssinatura} onChange={e => setFormData({ ...formData, planoAssinatura: e.target.value })}>
+                                                    <option value="basico">Básico</option><option value="padrao">Padrão</option><option value="premium">Premium</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="label-field">Acessibilidade</label>
-                                                <select className="input-field" value={formData.acessibilidade} onChange={e => setFormData({ ...formData, acessibilidade: +e.target.value })}>
-                                                    <option value={0}>Não</option><option value={1}>Sim</option>
+                                                <label className="label-field text-xs">Valor</label>
+                                                <input className="input-field py-1 text-xs" type="number" value={formData.valorMensal} onChange={e => setFormData({ ...formData, valorMensal: +e.target.value })} />
+                                            </div>
+                                            <div>
+                                                <label className="label-field text-xs">Contrato</label>
+                                                <select className="input-field py-1 text-xs" value={formData.tipoContrato} onChange={e => setFormData({ ...formData, tipoContrato: e.target.value })}>
+                                                    <option>MENSAL</option><option>ANUAL</option>
                                                 </select>
+                                            </div>
+
+                                            {/* Campos Ocultáveis/Menores */}
+                                            <div>
+                                                <label className="label-field text-xs">Idade</label>
+                                                <input className="input-field py-1 text-xs" type="number" value={formData.idade} onChange={e => setFormData({ ...formData, idade: +e.target.value })} />
+                                            </div>
+                                            <div>
+                                                <label className="label-field text-xs">Gênero</label>
+                                                <select className="input-field py-1 text-xs" value={formData.genero} onChange={e => setFormData({ ...formData, genero: e.target.value })}>
+                                                    <option>Masculino</option><option>Feminino</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="label-field text-xs">Região</label>
+                                                <div className="text-xs font-mono p-2 bg-input-bg rounded border border-border text-muted-foreground truncate">{formData.regiao}</div>
                                             </div>
                                         </div>
                                     </div>
