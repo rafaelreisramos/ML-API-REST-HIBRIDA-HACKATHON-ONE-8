@@ -1,0 +1,6 @@
+clienteId,idade,genero,regiao,valorMensal,diasUltimoAcesso,avaliacaoPlataforma,tempoAssinaturaMeses,avaliacaoConteudoMedia,avaliacaoConteudoUltimoMes,tempoMedioSessaoMin,tipoContrato,categoriaFavorita,acessibilidade,previsao,probabilidade,riscoAlto
+BATCH-001,35,Masculino,Sudeste,59.90,2,4,12,4.5,4.0,60,MENSAL,DOCUMENTÁRIOS,0,Analise Pendente,0.0,false
+BATCH-002,28,Feminino,Sul,29.90,45,1,6,3.0,2.5,20,MENSAL,FILMES,0,Analise Pendente,0.0,false
+BATCH-003,42,Feminino,Nordeste,89.90,5,5,24,5.0,5.0,90,ANUAL,SÉRIES,0,Analise Pendente,0.0,false
+BATCH-004,19,Masculino,Centro-Oeste,19.90,15,3,3,3.5,3.0,45,MENSAL,ESPORTES,0,Analise Pendente,0.0,false
+BATCH-005,55,Masculino,Norte,129.90,1,5,36,4.8,4.9,120,ANUAL,NOTÍCIAS,0,Analise Pendente,0.0,false
