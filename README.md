@@ -127,4 +127,32 @@ O projeto inclui scripts que testam o fluxo de ponta a ponta (Login -> Upload ->
 
 ---
 
+---
+
+## 🏆 Diferenciais Competitivos (Por que este projeto é Enterprise?)
+
+Diferente de MVPs comuns, o **ChurnInsight** foi arquitetado com padrões de Engenharia de Software robustos:
+
+### 1. 🛡️ Resiliência e Auto-Healing
+
+O sistema utiliza Docker Healthchecks avançados. Se o microserviço de IA falhar (ex: estouro de memória), o orquestrador o **reinicia automaticamente** sem derrubar a aplicação principal.
+
+### 2. ⚡ Arquitetura "Double-Write" (Híbrida)
+
+Combinamos a velocidade do **H2 (In-Memory)** para dashboards em tempo real com a segurança do **PostgreSQL** para persistência física.
+
+* **Resultado:** Leituras em microssegundos e tolerância a falhas de infraestrutura.
+
+### 3. 🚀 Processamento Paralelo (Multi-Thread)
+
+O upload de CSVs não bloqueia o servidor. Utilizamos `CompletableFuture` e Pools de Threads em Java para processar 50.000 clientes em background enquanto a API continua respondendo instantaneamente a outras requisições.
+
+### 4. 🧩 Poliglotismo Estratégico
+
+* **Java (Spring Boot):** Cuida da Segurança (JWT), Transações e Regras de Negócio.
+* **Python (FastAPI):** Dedicado exclusivamente à matemática pesada (RandomForest).
+* **Benefício:** Permite escalar a IA separadamente do Backend na nuvem.
+
+---
+
 **Desenvolvido pela Equipe G8**
