@@ -9,12 +9,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.BeanUtils;
+import java.util.stream.Collectors;
 
 /**
  * Service responsável pela lógica de negócio de análises de Churn.
  * Centraliza operações de CRUD e integração com o serviço de IA.
  */
 @Service
+
 public class ChurnService {
 
     @Autowired
@@ -28,6 +31,12 @@ public class ChurnService {
 
     @Value("${ml.service.url:http://localhost:5000}")
     private String mlServiceUrl;
+
+    private ChurnData clonar(ChurnData origem) {
+        ChurnData copia = new ChurnData();
+        BeanUtils.copyProperties(origem, copia);
+        return copia;
+    }
 
     /**
      * Lista todas as análises ativas.
@@ -66,7 +75,7 @@ public class ChurnService {
 
         // Espelhamento para banco secundário (Fail-safe)
         try {
-            repositorySecondary.save(salvo);
+            repositorySecondary.save(clonar(salvo));
         } catch (Exception e) {
             System.err.println("Erro ao salvar no banco secundário: " + e.getMessage());
         }
@@ -108,7 +117,7 @@ public class ChurnService {
     public ChurnData salvar(ChurnData dados) {
         ChurnData salvo = repository.save(dados);
         try {
-            repositorySecondary.save(salvo);
+            repositorySecondary.save(clonar(salvo));
         } catch (Exception e) {
             System.err.println("Erro ao salvar no banco secundário (salvar): " + e.getMessage());
         }
@@ -121,7 +130,10 @@ public class ChurnService {
     public List<ChurnData> salvarTodos(List<ChurnData> dados) {
         List<ChurnData> salvos = repository.saveAll(dados);
         try {
-            repositorySecondary.saveAll(salvos);
+            List<ChurnData> copias = salvos.stream()
+                    .map(this::clonar)
+                    .collect(Collectors.toList());
+            repositorySecondary.saveAll(copias);
         } catch (Exception e) {
             System.err.println("Erro ao salvar lote no banco secundário: " + e.getMessage());
         }

@@ -11,8 +11,10 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Service responsável pelo processamento em lote de análises de Churn.
@@ -34,6 +36,12 @@ public class ChurnBatchService {
     private static final int THREAD_POOL_SIZE = 20;
     private static final int BULK_INSERT_SIZE = 1000;
 
+    private ChurnData clonar(ChurnData origem) {
+        ChurnData copia = new ChurnData();
+        BeanUtils.copyProperties(origem, copia);
+        return copia;
+    }
+
     /**
      * Processa um lote de clientes a partir de um CSV (processamento sequencial).
      */
@@ -49,7 +57,7 @@ public class ChurnBatchService {
 
                 // Double-write secundário
                 try {
-                    repositorySecondary.save(salvo);
+                    repositorySecondary.save(clonar(salvo));
                 } catch (Exception ignored) {
                 }
 
@@ -115,7 +123,8 @@ public class ChurnBatchService {
 
             // Double-write secundário (Batch)
             try {
-                repositorySecondary.saveAll(batch);
+                List<ChurnData> copias = batch.stream().map(this::clonar).collect(Collectors.toList());
+                repositorySecondary.saveAll(copias);
             } catch (Exception e) {
                 System.err.println("Erro batch secundário: " + e.getMessage());
             }
