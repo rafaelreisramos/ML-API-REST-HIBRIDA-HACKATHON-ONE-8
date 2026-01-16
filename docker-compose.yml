@@ -12,12 +12,38 @@ services:
     environment:
       - ML_SERVICE_URL=http://ai-service:5000
       - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=churndb_pg
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
     depends_on:
       ai-service:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     networks:
       - churn-network
     restart: unless-stopped
+
+  # --- Banco de Dados Secundário (PostgreSQL) ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: churn-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=churndb_pg
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - churn-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- Python AI Service ---
   ai-service:

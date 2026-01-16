@@ -27,6 +27,9 @@ public class ChurnBatchService {
     @Autowired
     private ChurnService churnService;
 
+    @Autowired
+    private com.hackathon.churn.Repository.secondary.ChurnRepositorySecondary repositorySecondary;
+
     // Configurações de paralelismo
     private static final int THREAD_POOL_SIZE = 20;
     private static final int BULK_INSERT_SIZE = 1000;
@@ -42,8 +45,15 @@ public class ChurnBatchService {
             try {
                 ChurnData dados = mapearParaChurnData(linha);
                 ChurnData resultado = churnService.chamarServicoIA(dados);
-                repository.save(resultado);
-                resultados.add(resultado);
+                ChurnData salvo = repository.save(resultado);
+
+                // Double-write secundário
+                try {
+                    repositorySecondary.save(salvo);
+                } catch (Exception ignored) {
+                }
+
+                resultados.add(salvo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -102,6 +112,14 @@ public class ChurnBatchService {
             int end = Math.min(i + BULK_INSERT_SIZE, resultados.size());
             List<ChurnData> batch = resultados.subList(i, end);
             repository.saveAll(batch);
+
+            // Double-write secundário (Batch)
+            try {
+                repositorySecondary.saveAll(batch);
+            } catch (Exception e) {
+                System.err.println("Erro batch secundário: " + e.getMessage());
+            }
+
             saved += batch.size();
             System.out.println("  ✅ Salvos: " + saved + "/" + totalClientes);
         }

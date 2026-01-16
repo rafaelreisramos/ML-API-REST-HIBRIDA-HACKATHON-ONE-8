@@ -21,6 +21,9 @@ public class ChurnService {
     private ChurnRepository repository;
 
     @Autowired
+    private com.hackathon.churn.Repository.secondary.ChurnRepositorySecondary repositorySecondary;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     @Value("${ml.service.url:http://localhost:5000}")
@@ -59,7 +62,16 @@ public class ChurnService {
         ChurnData resultado = chamarServicoIA(input);
 
         // Salvar no banco
-        return repository.save(resultado);
+        ChurnData salvo = repository.save(resultado);
+
+        // Espelhamento para banco secundário (Fail-safe)
+        try {
+            repositorySecondary.save(salvo);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar no banco secundário: " + e.getMessage());
+        }
+
+        return salvo;
     }
 
     /**
@@ -94,13 +106,25 @@ public class ChurnService {
      * Salva uma análise no banco de dados.
      */
     public ChurnData salvar(ChurnData dados) {
-        return repository.save(dados);
+        ChurnData salvo = repository.save(dados);
+        try {
+            repositorySecondary.save(salvo);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar no banco secundário (salvar): " + e.getMessage());
+        }
+        return salvo;
     }
 
     /**
      * Salva múltiplas análises em lote.
      */
     public List<ChurnData> salvarTodos(List<ChurnData> dados) {
-        return repository.saveAll(dados);
+        List<ChurnData> salvos = repository.saveAll(dados);
+        try {
+            repositorySecondary.saveAll(salvos);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar lote no banco secundário: " + e.getMessage());
+        }
+        return salvos;
     }
 }
