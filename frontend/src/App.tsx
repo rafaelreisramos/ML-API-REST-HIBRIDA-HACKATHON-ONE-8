@@ -51,9 +51,18 @@ function App() {
     const { data: statsRaw, loading: statsLoading, refetch } = useQuery(GET_STATS, { pollInterval: 0 })
 
     // Derived stats
+    // Derived stats
     const total = statsRaw?.listarAnalises?.length || 0
-    const risk = statsRaw?.listarAnalises?.filter((a: any) => a.riscoAlto).length || 0
-    const riskRate = total > 0 ? ((risk / total) * 100).toFixed(1) : "0.0"
+
+    // Deduplicação para métricas de risco
+    const uniqueClientsMap = new Map();
+    statsRaw?.listarAnalises?.forEach((a: any) => uniqueClientsMap.set(a.clienteId, a));
+
+    const uniqueClientsCount = uniqueClientsMap.size;
+    // 'risk' agora conta apenas clientes únicos em risco
+    const risk = Array.from(uniqueClientsMap.values()).filter((a: any) => a.riscoAlto).length;
+
+    const riskRate = uniqueClientsCount > 0 ? ((risk / uniqueClientsCount) * 100).toFixed(1) : "0.0"
 
     // 3. Simulator State
     const [formData, setFormData] = useState({
