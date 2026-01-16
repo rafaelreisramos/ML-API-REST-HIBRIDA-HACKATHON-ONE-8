@@ -25,10 +25,25 @@ Bem-vindo à documentação da API **ChurnInsight**. Esta plataforma oferece uma
 
 A **ChurnInsight API** permite que empresas integrem capacidades preditivas em seus sistemas legados ou aplicações modernas.
 
-- **Base URL**: `http://localhost:8080` (Ambiente Local)
+- **Base URL**: `http://localhost:9999` (Ambiente Local)
 - **Formatos Suportados**: JSON, Multipart (CSV)
 - **Protocolos**: RESTful, GraphQL
 - **Autenticação**: JWT (JSON Web Token)
+
+### Exemplo: Buscar por ID
+
+```graphql
+query {
+  buscarPorId(id: "uuid-do-cliente") {
+    id
+    clienteId
+    previsao
+    modeloUsado
+  }
+}
+```
+
+### Exemplo: Mutation
 
 ---
 
@@ -100,7 +115,7 @@ docker-compose up --build -d
 **3. Teste a saúde da API**
 
 ```bash
-curl http://localhost:8080/api/health
+curl http://localhost:9999/api/health
 ```
 
 ---
@@ -114,7 +129,7 @@ Todos os endpoints de negócio são protegidos. Você precisa obter um token `Be
 - **POST** `/usuarios`
 
 ```bash
-curl -X POST http://localhost:8080/usuarios \
+curl -X POST http://localhost:9999/usuarios \
   -H "Content-Type: application/json" \
   -d '{"login": "admin", "senha": "123"}'
 ```
@@ -124,7 +139,7 @@ curl -X POST http://localhost:8080/usuarios \
 - **POST** `/login`
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:9999/login \
   -H "Content-Type: application/json" \
   -d '{"login": "admin", "senha": "123"}'
 ```
@@ -183,7 +198,7 @@ Ideal para processamento noturno ou cargas massivas de dados históricos.
 **Exemplo:**
 
 ```bash
-curl -X POST http://localhost:8080/api/churn/batch/optimized \
+curl -X POST http://localhost:9999/api/churn/batch/optimized \
   -H "Authorization: Bearer <TOKEN>" \
   -F "file=@base_clientes.csv" > resultado.csv
 ```

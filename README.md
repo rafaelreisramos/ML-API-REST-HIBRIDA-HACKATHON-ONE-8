@@ -98,12 +98,13 @@ graph TD
     end
     
     subgraph "Backend Core (Java)"
-    API -->|"Persiste"| H2["H2 Database (Arquivo Local)"]
+    API -->|"Persistência Primária (Leitura/Escrita)"| H2["DB Primário (H2 In-Memory)"]
+    API -->|"Espelhamento (Fail-safe)"| PG["DB Secundário (PostgreSQL)"]
     end
 ```
 
 1. **Frontend (React + Vite):** Interface responsiva para upload de CSVs e visualização de dashboards.
-2. **Backend (Java 17 Spring Boot):** Gerencia autenticação (JWT), regras de negócio e persistência no banco H2.
+2. **Backend (Java 17 Spring Boot):** Gerencia autenticação (JWT) e implementa padrão **Double-Write** (H2 para velocidade, PostgreSQL para robustez).
 3. **AI Service (Python 3.11):** Executa o modelo de Machine Learning, com funcionalidades de **Auto-Healing** (reconstrução automática do modelo em caso de falha).
 
 ---
