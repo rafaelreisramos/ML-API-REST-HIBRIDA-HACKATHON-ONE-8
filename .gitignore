@@ -87,3 +87,11 @@ modelo css lovable/
 .token
 teste_diagnostico.csv
 teste_risco_alto.csv
+
+# Terraform & OCI
+*.tfvars
+*.tfstate*
+.terraform/
+error_log.txt
+OCI_ACCESS_INFO.md
+.oci/

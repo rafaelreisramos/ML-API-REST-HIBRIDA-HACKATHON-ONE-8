@@ -7,17 +7,19 @@ variable "tenancy_ocid" {
 variable "user_ocid" {
   description = "OCID do usuário OCI"
   type        = string
+  default     = null
 }
 
 variable "fingerprint" {
   description = "Fingerprint da chave API OCI"
   type        = string
+  default     = null
 }
 
 variable "private_key_path" {
   description = "Caminho para a chave privada OCI"
   type        = string
-  default     = "~/.oci/oci_api_key.pem"
+  default     = null
 }
 
 variable "region" {
@@ -71,17 +73,38 @@ variable "public_subnet_cidr" {
 }
 
 # Compute (Always Free: 2x VM.Standard.E2.1.Micro)
+# Compute (Always Free: 2x VM.Standard.E2.1.Micro)
+# Compute (Paid/Trial: VM.Standard.E4.Flex)
 variable "instance_shape" {
-  description = "Shape Always Free"
+  description = "Shape Flexivel (AMD E4)"
   type        = string
-  default     = "VM.Standard.E2.1.Micro" # Always Free
+  default     = "VM.Standard3.Flex"
+}
+
+# Recursos App Server (Front + Back)
+variable "app_ocpus" {
+  type    = number
+  default = 1 # 2 vCPUs
+}
+variable "app_memory" {
+  type    = number
+  default = 8 # 8 GB RAM
+}
+
+# Recursos AI Server (ML Model)
+variable "ai_ocpus" {
+  type    = number
+  default = 2 # 4 vCPUs - Mais poder para ML
+}
+variable "ai_memory" {
+  type    = number
+  default = 16 # 16 GB RAM - Mais memória para pandas/sklearn
 }
 
 variable "instance_image_ocid" {
-  description = "OCID da imagem Oracle Linux 8 (Always Free)"
+  description = "OCID da imagem Oracle Linux 8"
   type        = string
-  # Varia por região - obtenha do console ou CLI
-  # Exemplo São Paulo: ocid1.image.oc1.sa-saopaulo-1.aaaaaaaa...
+  default     = null
 }
 
 # Tags
