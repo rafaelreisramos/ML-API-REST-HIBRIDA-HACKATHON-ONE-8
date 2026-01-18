@@ -43,6 +43,8 @@ services:
       - DB_NAME=churndb_pg
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - LOGGING_LEVEL_ORG_APACHE_COYOTE_HTTP11=DEBUG
     depends_on:
       ai-service:
         condition: service_healthy

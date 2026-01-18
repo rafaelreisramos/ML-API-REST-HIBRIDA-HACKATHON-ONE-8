@@ -25,10 +25,26 @@ Bem-vindo à documentação da API **ChurnInsight**. Esta plataforma oferece uma
 
 A **ChurnInsight API** permite que empresas integrem capacidades preditivas em seus sistemas legados ou aplicações modernas.
 
-- **Base URL**: `http://localhost:9999` (Ambiente Local)
+### URLs de Acesso
+
+**Desenvolvimento Local:**
+
+- **Base URL**: `http://localhost:9999`
+- **GraphQL Playground**: `http://localhost:9999/graphiql`
+- **Swagger (AI Service)**: `http://localhost:5000/docs`
+
+**Produção (OCI):**
+
+- **Base URL (HTTPS)**: `https://<SEU_IP>.nip.io`
+- **Backend API**: `http://<SEU_IP>:9999` (acesso direto, sem SSL)
+- **Frontend**: `https://<SEU_IP>.nip.io` (com SSL automático)
+
+### Características
+
 - **Formatos Suportados**: JSON, Multipart (CSV)
 - **Protocolos**: RESTful, GraphQL
 - **Autenticação**: JWT (JSON Web Token)
+- **Segurança**: HTTPS com certificados Let's Encrypt (produção)
 
 ### Exemplo: Buscar por ID
 

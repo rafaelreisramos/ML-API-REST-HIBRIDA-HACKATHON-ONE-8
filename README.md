@@ -37,16 +37,28 @@ Para detalhes específicos, consulte nossos guias oficiais incluídos neste repo
 
 ## 🚀 Guia Rápido (Quick Start)
 
-Rodar este projeto é extremante simples. Você precisa apenas do **Docker Desktop** instalado.
+### Desenvolvimento Local
 
-### 1. Clonar o Repositório
+Rodar este projeto localmente é extremamente simples. Você precisa apenas do **Docker Desktop** instalado.
+
+#### 1. Clonar o Repositório
 
 ```bash
 git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
 cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
 ```
 
-### 2. Iniciar o Ambiente
+#### 2. Configurar Variáveis de Ambiente (Opcional)
+
+Para desenvolvimento local, crie um arquivo `.env` na raiz do projeto:
+
+```bash
+DOMAIN=localhost
+```
+
+Para produção com HTTPS automático, o domínio será configurado automaticamente usando `nip.io`.
+
+#### 3. Iniciar o Ambiente
 
 No terminal, dentro da pasta do projeto:
 
@@ -56,16 +68,36 @@ docker-compose up -d --build
 
 > *Aguarde cerca de 2 minutos na primeira vez para o build dos containers e inicialização do Banco de Dados.*
 
-### 2. Acessar o Sistema
+#### 4. Acessar o Sistema
 
-* **Frontend (Dashboard):** [http://localhost:3000](http://localhost:3000)
+**Desenvolvimento Local:**
+
+* **Frontend (Dashboard):** [http://localhost](http://localhost)
 * **Login:** `admin`
 * **Senha:** `123`
 
-### 3. Links de Desenvolvimento
+**Links de Desenvolvimento:**
 
 * **GraphQL Playground:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
 * **Swagger UI (AI Service):** [http://localhost:5000/docs](http://localhost:5000/docs)
+
+### 🌐 Deploy em Produção (OCI/Cloud)
+
+O projeto inclui configuração automática de **HTTPS com certificado SSL válido** usando Traefik e Let's Encrypt.
+
+#### Acesso em Produção
+
+* **URL Segura (HTTPS):** `https://<SEU_IP>.nip.io`
+* **Certificado SSL:** Gerado automaticamente pelo Let's Encrypt
+* **Redirecionamento:** HTTP → HTTPS automático
+
+#### Infraestrutura OCI
+
+O projeto inclui scripts Terraform para deploy na Oracle Cloud Infrastructure (OCI):
+
+* **Localização:** `oci-pipeline/terraform/`
+* **Controle de VMs:** `OCI_VM-Control/CONTROLE_OCI.bat`
+* **Documentação:** Veja `OCI_ACCESS_INFO.md` e `OCI_NETWORK_DOCS.md`
 
 ---
 
@@ -93,25 +125,32 @@ Certifique-se de que o Backend (Porta 9999) subiu completamente.
 
 ## 🏗️ Arquitetura do Sistema
 
-Operamos com 3 serviços principais orquestrados:
+Operamos com 4 serviços principais orquestrados:
 
 ```mermaid
 graph TD
-    User["Usuário / Analista"] -->|Navegador| UI["Frontend React (Porta 3000)"]
+    User["Usuário / Analista"] -->|"HTTPS (443)"| Traefik["Traefik Proxy<br/>(SSL/TLS Termination)"]
+    Traefik -->|"HTTP Interno"| UI["Frontend React (Porta 80)"]
     UI -->|"GraphQL / REST"| API["Backend Java (Porta 9999)"]
     API -->|"Predição (HTTP)"| AI["AI Service Python (Porta 5000)"]
     
     subgraph "Persistência"
     API -->|"Rápido"| H2["H2 (Memória)"]
-    API -->|" Seguro"| PG["PostgreSQL (Disco)"]
+    API -->|"Seguro"| PG["PostgreSQL (Disco)"]
+    end
+    
+    subgraph "Segurança"
+    Traefik -->|"Let's Encrypt"| SSL["Certificados SSL<br/>Auto-Renováveis"]
     end
 ```
 
 ### Destaques Técnicos
 
+* **HTTPS Automático**: Certificados SSL válidos gerados automaticamente via Let's Encrypt com renovação automática.
 * **Auto-Healing**: Se o serviço de IA cair, ele reinicia automaticamente.
 * **Double-Write**: Gravamos dados no H2 (para velocidade extrema no dashboard) e no PostgreSQL (para segurança) simultaneamente.
 * **Poliglota**: Backend em Java (Spring Boot 3) e IA em Python (FastAPI + Scikit-Learn).
+* **Reverse Proxy**: Traefik gerencia roteamento, SSL/TLS e balanceamento de carga.
 
 ---
 
