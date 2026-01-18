@@ -122,6 +122,7 @@ def process_batch(token, filename):
                 churn_count = 0
                 safe_count = 0
                 total_revenue_risk = 0.0
+                total_prob_sum = 0.0
                 
                 header_skipped = False
                 header_map = {}
@@ -155,6 +156,8 @@ def process_batch(token, filename):
                     except:
                         prob = 0.0
                     
+                    total_prob_sum += prob
+                    
                     # Limiar exato do Modelo Random Forest G8
                     THRESHOLD_MODELO = 0.4287059456550982
                     
@@ -176,28 +179,30 @@ def process_batch(token, filename):
                     print(f"   {color}{cli_id:<10} | {prev_text:<20} | {prob:.4f}     | {icon} {status} (R$ {valor_mensal}){C_RESET}")
                     time.sleep(0.05) # Pausa dramática para efeito visual
                 
-                return churn_count, safe_count, total_revenue_risk, len(lines)-1
+                return churn_count, safe_count, total_revenue_risk, total_prob_sum, len(lines)-1
             else:
                 print(f"{C_RED}❌ Falha no Lote: {response.text}{C_RESET}")
-                return 0,0,0,0
+                return 0,0,0,0,0
         except Exception as e:
             print(f"{C_RED}❌ Erro: {e}{C_RESET}")
-            return 0,0,0,0
+            return 0,0,0,0,0
 
-def print_report(churn, safe, revenue, total):
+def print_report(churn, safe, revenue, prob_sum, total):
     print("\n")
     print(f"{C_BLUE}" + "="*80)
     print(f"{C_BOLD}   RELATÓRIO EXECUTIVO DE ANÁLISE{C_RESET}")
     print(f"{C_BLUE}" + "="*80 + f"{C_RESET}")
     
     churn_rate = (churn / total * 100) if total > 0 else 0
+    avg_prob = (prob_sum / total * 100) if total > 0 else 0
     
     print(f"   Total Processado : {C_BOLD}{total} Clientes{C_RESET}")
     # print(f"   Tempo Médio      : {C_BOLD}2.8s{C_RESET}")
     print("-" * 40)
     print(f"   ✅ Retidos       : {C_GREEN}{safe} Clientes{C_RESET}")
-    print(f"   🚨 Risco de Churn: {C_RED}{churn} Clientes{C_RESET}")
-    print(f"   📉 Taxa de Churn : {C_YELLOW}{churn_rate:.1f}%{C_RESET}")
+    print(f"   🚨 Risco de Churn: {C_RED}{churn} Clientes{C_RESET} (Headcount)")
+    print(f"   📉 Taxa de Risco : {C_YELLOW}{churn_rate:.1f}%{C_RESET} (Vol. Clientes)")
+    print(f"   📊 Score Médio   : {C_CYAN}{avg_prob:.1f}%{C_RESET} (Média Global de Probabilidade)")
     print("-" * 40)
     print(f"   💰 Receita em Risco: {C_RED}R$ {revenue:,.2f}{C_RESET} / mês")
     print()
@@ -232,10 +237,10 @@ def main():
             print(f"{C_YELLOW}⚠️ Arquivo {INPUT_FILE} não encontrado. Usando dados simulados.{C_RESET}")
             # ...logica de fallback omitida para focar no arquivo real...
             
-    churn, safe, revenue, total = process_batch(token, csv_file)
+    churn, safe, revenue, prob_sum, total = process_batch(token, csv_file)
     
     if total > 0:
-        print_report(churn, safe, revenue, total)
+        print_report(churn, safe, revenue, prob_sum, total)
 
 if __name__ == "__main__":
     try:
