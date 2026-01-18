@@ -29,6 +29,7 @@ Abaixo você encontra o mapa completo de documentação técnica e funcional do 
 
 ### 📖 Guia do Usuário e API
 
+* [🌐 **Apresentação do Projeto**](https://araken13.github.io/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/presentation.html): Slides interativos da apresentação.
 * [📘 **Manual de Uso**](./docs/MANUAL_DE_USO.md): Guia para o usuário final e navegação no Dashboard.
 * [📡 **Documentação da API**](./docs/API_DOCUMENTATION.md): Detalhes de Endpoints, Schemas GraphQL e Exemplos.
 * [🛠️ **Manual de Erros**](./docs/MANUAL_DE_ERROS.md): Guia de Troubleshooting e resolução de problemas comuns.
