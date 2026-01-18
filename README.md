@@ -57,9 +57,9 @@ Abaixo você encontra o mapa completo de documentação técnica e funcional do 
 
 ## 🚀 Guia Rápido (Quick Start)
 
-### Desenvolvimento Local
+### Desenvolvimento Local Simplificado (Recomendado)
 
-Rodar este projeto localmente é extremamente simples. Você precisa apenas do **Docker Desktop** instalado.
+Rodar este projeto localmente para desenvolvimento ou demonstração (sem HTTPS/Traefik complexo) é simples:
 
 #### 1. Clonar o Repositório
 
@@ -68,38 +68,39 @@ git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git
 cd ML-API-REST-HIBRIDA-HACKATHON-ONE-8
 ```
 
-#### 2. Configurar Variáveis de Ambiente (Opcional)
+#### 2. Iniciar o Ambiente (Modo Local)
 
-Para desenvolvimento local, crie um arquivo `.env` na raiz do projeto:
-
-```bash
-DOMAIN=localhost
-```
-
-Para produção com HTTPS automático, o domínio será configurado automaticamente usando `nip.io`.
-
-#### 3. Iniciar o Ambiente
-
-No terminal, dentro da pasta do projeto:
+Utilize o arquivo de composição local que libera a porta **3000** e otimiza a inicialização:
 
 ```bash
-docker-compose up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
-> *Aguarde cerca de 2 minutos na primeira vez para o build dos containers e inicialização do Banco de Dados.*
+> *Aguarde cerca de 2 minutos para o build e inicialização dos serviços.*
 
-#### 4. Acessar o Sistema
+#### 3. Acessar o Sistema
 
-**Desenvolvimento Local:**
+* **Frontend (Dashboard):** [http://localhost:3000](http://localhost:3000)
+* **API Backend:** [http://localhost:9999](http://localhost:9999)
+* **Login Padrão:** `admin` / `123456`
 
-* **Frontend (Dashboard):** [http://localhost](http://localhost)
-* **Login:** `admin`
-* **Senha:** `123456`
+---
 
-**Links de Desenvolvimento:**
+## 🎬 Modo Apresentação (Live Demo)
 
-* **GraphQL Playground:** [http://localhost:9999/graphiql](http://localhost:9999/graphiql)
-* **Swagger UI (AI Service):** [http://localhost:5000/docs](http://localhost:5000/docs)
+O projeto inclui ferramentas de automação para apresentações ao vivo ("Demo Mode"), com capas visuais e orquestração de cenários.
+
+**Para iniciar a Demo Local:**
+
+1. Certifique-se que o Docker está rodando (Passo 2 acima).
+2. Execute o script de capa:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File developer_tools/scripts/presentation_cover_local.ps1
+```
+
+1. Pressione **ENTER** para abrir o Menu do Orquestrador.
+2. Escolha **Opção 2 (Demo Visual)** para apresentar dados reais ou **Opção 3** para Teste de Carga.
 
 ### 🌐 Deploy em Produção (OCI/Cloud)
 
