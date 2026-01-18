@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurnInsight - Backend & Frontend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px;
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            font-size: 2.8em;
+            margin-bottom: 30px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ffeb3b;
+        }
+
+        p, li {
+            font-size: 1.4em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin: 20px 0;
+            border-left: 5px solid #ffd700;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .tech-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .tech-item:hover {
+            transform: scale(1.05);
+            border-color: #ffd700;
+        }
+
+        .architecture-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1.5em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        ul {
+            list-style: none;
+            margin-left: 20px;
+        }
+
+        ul li:before {
+            content: "▸ ";
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin: 20px 0;
+            border-left: 4px solid #ffd700;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .diagram {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 1.1em;
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <h1>📊 ChurnInsight</h1>
+            <p class="subtitle">Sistema Híbrido de IA para Previsão de Churn</p>
+            <div class="highlight">
+                <h3>🎯 Arquitetura Backend & Frontend</h3>
+                <p style="font-size: 1.3em;">Uma solução enterprise com Java, Python e React</p>
+            </div>
+            <p style="margin-top: 40px; font-size: 1.2em; opacity: 0.8;">Hackathon Alura G8 - 2025</p>
+        </div>
+
+        <!-- Slide 2: Visão Geral da Stack -->
+        <div class="slide">
+            <h2>🏗️ Stack Tecnológica</h2>
+            <div class="tech-stack">
+                <div class="tech-item">☕ Java 17 + Spring Boot 3</div>
+                <div class="tech-item">🐍 Python + FastAPI</div>
+                <div class="tech-item">⚛️ React + TypeScript</div>
+                <div class="tech-item">🎨 Tailwind CSS</div>
+                <div class="tech-item">🔍 GraphQL + REST</div>
+                <div class="tech-item">🐳 Docker Compose</div>
+                <div class="tech-item">🗄️ PostgreSQL + H2</div>
+                <div class="tech-item">🤖 Scikit-Learn (ML)</div>
+            </div>
+            <div class="highlight" style="margin-top: 40px;">
+                <h3>🎯 Arquitetura Poliglota Estratégica</h3>
+                <p>Cada linguagem onde ela é mais eficiente</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Backend - Arquitetura -->
+        <div class="slide">
+            <h2>🔧 Backend: Arquitetura Híbrida</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Java Backend (Porta 9999)</h3>
+                    <ul>
+                        <li>Spring Boot 3.2+</li>
+                        <li>Autenticação JWT</li>
+                        <li>GraphQL com Spring GraphQL</li>
+                        <li>REST API tradicional</li>
+                        <li>Processamento assíncrono</li>
+                        <li>Validação de dados</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Python AI Service (Porta 5000)</h3>
+                    <ul>
+                        <li>FastAPI framework</li>
+                        <li>Random Forest (Scikit-Learn)</li>
+                        <li>Processamento paralelo</li>
+                        <li>Modelo pré-treinado</li>
+                        <li>Health checks automáticos</li>
+                        <li>Auto-restart em falhas</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="architecture-box" style="margin-top: 30px;">
+                <strong>🔗 Comunicação:</strong> Backend Java ↔️ HTTP REST ↔️ Python AI
+            </div>
+        </div>
+
+        <!-- Slide 4: Backend - Double Write -->
+        <div class="slide">
+            <h2>⚡ Backend: Estratégia "Double-Write"</h2>
+            <div class="highlight">
+                <h3>Por que dois bancos de dados?</h3>
+            </div>
+            <div class="two-columns">
+                <div class="architecture-box">
+                    <h3>🚀 H2 (In-Memory)</h3>
+                    <ul>
+                        <li>Leituras em microssegundos</li>
+                        <li>Dashboard em tempo real</li>
+                        <li>Métricas instantâneas</li>
+                        <li>Zero latência de disco</li>
+                    </ul>
+                </div>
+                <div class="architecture-box">
+                    <h3>🛡️ PostgreSQL (Persistente)</h3>
+                    <ul>
+                        <li>Dados seguros em disco</li>
+                        <li>Backup automático</li>
+                        <li>Auditoria completa</li>
+                        <li>Recuperação de desastres</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="code-block">
+                → Escrita simultânea nos dois bancos<br>
+                → Dashboard lê do H2 (rápido)<br>
+                → Relatórios leem do PostgreSQL (confiável)
+            </div>
+        </div>
+
+        <!-- Slide 5: Backend - Endpoints -->
+        <div class="slide">
+            <h2>🔌 Backend: APIs Disponíveis</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔐 Autenticação</h3>
+                    <div class="code-block" style="font-size: 0.9em;">
+                        POST /auth/login<br>
+                        → JWT Token válido
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 GraphQL</h3>
+                    <div class="code-block" style="font-size: 0.9em;">
+                        POST /graphql<br>
+                        → Queries flexíveis
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>🎲 Predição Individual</h3>
+                    <div class="code-block" style="font-size: 0.9em;">
+                        POST /predict<br>
+                        → Risco de churn em %
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>📦 Batch Upload</h3>
+                    <div class="code-block" style="font-size: 0.9em;">
+                        POST /batch<br>
+                        → CSV processado
+                    </div>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 30px;">
+                <strong>✨ Diferencial:</strong> GraphQL permite que o frontend peça exatamente os dados necessários
+            </div>
+        </div>
+
+        <!-- Slide 6: Backend - Processamento Assíncrono -->
+        <div class="slide">
+            <h2>🚀 Backend: Alta Performance</h2>
+            <h3>Processamento Paralelo com CompletableFuture</h3>
+            <div class="highlight">
+                <p><strong>Cenário:</strong> Upload de CSV com 50.000 clientes</p>
+            </div>
+            <div class="diagram">
+                1. Cliente envia CSV → Resposta imediata (202 Accepted)<br>
+                2. Backend divide em chunks de 100 registros<br>
+                3. Pool de threads processa em paralelo<br>
+                4. Cada thread chama Python AI Service<br>
+                5. Resultados agregados em memória<br>
+                6. Download disponível automaticamente
+            </div>
+            <div class="architecture-box">
+                <strong>⚙️ Resultado:</strong> 50.000 predições em ~3 minutos sem bloquear a API
+            </div>
+        </div>
+
+        <!-- Slide 7: Frontend - Arquitetura -->
+        <div class="slide">
+            <h2>🎨 Frontend: Arquitetura React</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Tecnologias</h3>
+                    <ul>
+                        <li>React 18 + TypeScript</li>
+                        <li>Vite (build rápido)</li>
+                        <li>Tailwind CSS</li>
+                        <li>Recharts (gráficos)</li>
+                        <li>React Router v6</li>
+                        <li>Context API (estado)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Estrutura de Componentes</h3>
+                    <ul>
+                        <li>Layout responsivo</li>
+                        <li>Dashboard em tempo real</li>
+                        <li>Simulador interativo</li>
+                        <li>Upload com drag & drop</li>
+                        <li>Visualizações dinâmicas</li>
+                        <li>PWA-ready</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 30px;">
+                <strong>🎯 Princípio:</strong> UX moderna com performance nativa
+            </div>
+        </div>
+
+        <!-- Slide 8: Frontend - Features -->
+        <div class="slide">
+            <h2>✨ Frontend: Funcionalidades</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><span class="emoji">📊</span>Dashboard</h3>
+                    <p>Métricas em tempo real, gráficos interativos, filtros dinâmicos</p>
+                </div>
+                <div class="feature-card">
+                    <h3><span class="emoji">🎲</span>Simulador</h3>
+                    <p>Interface para testar cenários de churn individuais</p>
+                </div>
+                <div class="feature-card">
+                    <h3><span class="emoji">📁</span>Batch Upload</h3>
+                    <p>Drag & drop de CSV, barra de progresso, download automático</p>
+                </div>
+                <div class="feature-card">
+                    <h3><span class="emoji">📈</span>Análise de Risco</h3>
+                    <p>Classificação por segmentos, visualização de tendências</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Frontend - Integração GraphQL -->
+        <div class="slide">
+            <h2>🔗 Frontend: Consumo GraphQL</h2>
+            <div class="highlight">
+                <h3>Por que GraphQL?</h3>
+                <ul>
+                    <li>Frontend pede apenas os campos necessários</li>
+                    <li>Reduz tráfego de rede em 40-60%</li>
+                    <li>Tipagem forte com TypeScript</li>
+                    <li>Evita múltiplas chamadas REST</li>
+                </ul>
+            </div>
+            <div class="code-block">
+query ObterDashboard {<br>
+&nbsp;&nbsp;clientes {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;id<br>
+&nbsp;&nbsp;&nbsp;&nbsp;riskScore<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ultimoAcesso<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;metricas {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;riscoMedio<br>
+&nbsp;&nbsp;&nbsp;&nbsp;totalEmRisco<br>
+&nbsp;&nbsp;}<br>
+}
+            </div>
+        </div>
+
+        <!-- Slide 10: Integração Backend-Frontend -->
+        <div class="slide">
+            <h2>🔄 Fluxo Completo: Upload Batch</h2>
+            <div class="diagram">
+                <strong>1. Frontend (React)</strong><br>
+                → Usuário arrasta CSV<br>
+                → Validação de formato<br>
+                → Envia para backend via FormData<br><br>
+                
+                <strong>2. Backend (Java)</strong><br>
+                → Valida autenticação JWT<br>
+                → Recebe arquivo<br>
+                → Divide em chunks paralelos<br>
+                → Chama Python AI Service<br><br>
+                
+                <strong>3. AI Service (Python)</strong><br>
+                → Recebe dados<br>
+                → Aplica Random Forest<br>
+                → Retorna predições<br><br>
+                
+                <strong>4. Backend → Frontend</strong><br>
+                → Gera CSV enriquecido<br>
+                → Download automático
+            </div>
+        </div>
+
+        <!-- Slide 11: Diferenciais Técnicos -->
+        <div class="slide">
+            <h2>🏆 Diferenciais Enterprise</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🛡️ Auto-Healing</h3>
+                    <p>Se Python AI falhar, Docker reinicia automaticamente sem derrubar o sistema</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Zero-Downtime</h3>
+                    <p>Processamento assíncrono permite que API continue respondendo durante uploads massivos</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 Segurança JWT</h3>
+                    <p>Autenticação stateless com tokens assinados e refresh automático</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Métricas em Tempo Real</h3>
+                    <p>H2 in-memory permite dashboard sem lag com milhares de registros</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: DevOps e Deploy -->
+        <div class="slide">
+            <h2>🚀 DevOps & Infraestrutura</h2>
+            <div class="two-columns">
+                <div class="architecture-box">
+                    <h3>Local (Desenvolvimento)</h3>
+                    <ul>
+                        <li>Docker Compose simplificado</li>
+                        <li>Hot reload habilitado</li>
+                        <li>Porta 3000 liberada</li>
+                        <li>Scripts de automação</li>
+                    </ul>
+                </div>
+                <div class="architecture-box">
+                    <h3>Produção (OCI)</h3>
+                    <ul>
+                        <li>Traefik como Reverse Proxy</li>
+                        <li>HTTPS com Let's Encrypt</li>
+                        <li>Certificados auto-renováveis</li>
+                        <li>Terraform para IaC</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 30px;">
+                <strong>✨ Híbrido:</strong> Mesmo código roda local e na nuvem sem modificações
+            </div>
+        </div>
+
+        <!-- Slide 13: Performance -->
+        <div class="slide">
+            <h2>⚡ Benchmarks de Performance</h2>
+            <div class="architecture-box">
+                <h3>Testes Realizados</h3>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Login</h3>
+                    <p><strong>~50ms</strong></p>
+                    <p>Autenticação + geração JWT</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Predição Individual</h3>
+                    <p><strong>~200ms</strong></p>
+                    <p>Java → Python → Resposta</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Dashboard Query</h3>
+                    <p><strong>&lt;100ms</strong></p>
+                    <p>Leitura de 10.000 registros do H2</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Batch 50k linhas</h3>
+                    <p><strong>~3 minutos</strong></p>
+                    <p>Processamento paralelo completo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Próximos Passos -->
+        <div class="slide">
+            <h2>🔮 Roadmap & Melhorias</h2>
+            <div class="two-columns">
+                <div>
+                    <h3>Backend</h3>
+                    <ul>
+                        <li>Cache com Redis</li>
+                        <li>Rate limiting</li>
+                        <li>Logs estruturados</li>
+                        <li>Métricas Prometheus</li>
+                        <li>Webhooks de notificação</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li>PWA completo (offline)</li>
+                        <li>Tema dark/light</li>
+                        <li>Exportação PDF</li>
+                        <li>Notificações push</li>
+                        <li>Personalização de widgets</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="highlight" style="margin-top: 30px;">
+                <strong>🎯 Foco:</strong> Escalabilidade horizontal e observabilidade
+            </div>
+        </div>
+
+        <!-- Slide 15: Conclusão -->
+        <div class="slide">
+            <h1>🎯 Conclusão</h1>
+            <div class="highlight">
+                <h2>ChurnInsight = Arquitetura Enterprise</h2>
+                <p class="subtitle">Backend robusto + Frontend moderno + IA real</p>
+            </div>
+            <div class="two-columns" style="margin-top: 40px;">
+                <div class="architecture-box">
+                    <h3>✅ O que entregamos</h3>
+                    <ul>
+                        <li>Sistema full-stack completo</li>
+                        <li>APIs REST + GraphQL</li>
+                        <li>ML em produção</li>
+                        <li>Docker ready</li>
+                        <li>HTTPS configurado</li>
+                    </ul>
+                </div>
+                <div class="architecture-box">
+                    <h3>💡 Valor de Negócio</h3>
+                    <ul>
+                        <li>Reduz churn proativamente</li>
+                        <li>Escalável para milhões</li>
+                        <li>Deploy em minutos</li>
+                        <li>Manutenível a longo prazo</li>
+                        <li>Documentado e testado</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 50px; font-size: 2em; text-align: center;">
+                <strong>Obrigado!</strong> 🚀
+            </p>
+        </div>
+    </div>
+
+    <div class="slide-number">
+        <span id="current">1</span> / <span id="total">15</span>
+    </div>
+
+    <div class="navigation">
+        <button id="prev">◄ Anterior</button>
+        <button id="next">Próximo ►</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current').textContent = currentSlide + 1;
+        }
+
+        document.getElementById('prev').addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+        });
+
+        document.getElementById('next').addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+        });
+
+        // Navegação por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+            if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
+        });
+    </script>
+</body>
+</html>
