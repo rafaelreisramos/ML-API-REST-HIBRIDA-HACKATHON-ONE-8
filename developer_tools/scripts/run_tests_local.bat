@@ -2,43 +2,26 @@
 setlocal EnableDelayedExpansion
 
 :: ============================================================================
-::  TEST SUITE RUNNER - CHURN INSIGHT
-:: ============================================================================
-::  Usage: run_tests.bat [OCI|LOCAL]
+::  TEST SUITE RUNNER - CHURN INSIGHT (LOCAL)
 :: ============================================================================
 
-set TARGET=%1
-if "%TARGET%"=="" set TARGET=LOCAL
-
-if /I "%TARGET%"=="OCI" (
-    set API_URL=http://137.131.179.58:9999
-    echo [INFO] Targeting OCI Environment: !API_URL!
-) else (
-    set API_URL=http://localhost:9999
-    echo [INFO] Targeting Local Environment: !API_URL!
-)
+set API_URL=http://localhost:9999
+echo [INFO] Targeting Local Environment: !API_URL!
 
 echo.
 echo ============================================================================
-echo   CHURN INSIGHT - AUTOMATED TEST SUITE
+echo   CHURN INSIGHT - AUTOMATED TEST SUITE (LOCAL)
 echo ============================================================================
 echo.
 
-:: 1. Health Check (Skipped curl check, relying on Python tests)
 echo [INFO] Starting Test Suite Execution...
-
 
 echo.
 set PASSED=0
 set FAILED=0
 
 :: 2. Run Python Tests
-:: 2. Run Python Tests
-if "%TARGET%"=="OCI" (
-    call :RunTest "oci_test_graphql.py" "1. Connectivity and Schema Check (OCI)"
-) else (
-    call :RunTest "local_test_graphql.py" "1. Connectivity and Schema Check (Local)"
-)
+call :RunTest "local_test_graphql.py" "1. Connectivity and Schema Check (Local)"
 call :RunTest "test_api_e2e.py"     "2. End-to-End Flow Login Create Query"
 :: call :RunTest "verify_model_logic.py" "3. Business Logic Verification"
 call :RunTest "test_validation.py"  "4. Security Validation Negative Testing"
@@ -71,10 +54,10 @@ echo ---------------------------------------------------------------------------
 if exist %SCRIPT% (
     python %SCRIPT%
     if !errorlevel! equ 0 (
-        echo   [PASS] %NAME% Passed.
+        echo   [PASS] !NAME! Passed.
         set /a PASSED+=1
     ) else (
-        echo   [FAIL] %NAME% Failed.
+        echo   [FAIL] !NAME! Failed.
         set /a FAILED+=1
     )
 ) else (

@@ -127,6 +127,8 @@ Para apresentações de vendas ou validações técnicas, o sistema possui um mo
 powershell -ExecutionPolicy Bypass -File developer_tools/scripts/presentation_cover_local.ps1
 ```
 
+Este script foi ajustado para **forçar o uso do ambiente local (localhost)**, garantindo que a demonstração não tente conectar na infraestrutura de nuvem (OCI) durante testes offline ou de desenvolvimento.
+
 1. Pressione **ENTER** e escolha o cenário desejado no menu.
 
 ### Funcionalidades da Demo

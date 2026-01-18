@@ -4,6 +4,13 @@
 
 Reorganização completa da estrutura de arquivos e finalização da documentação.
 
+### 🧪 Testes Locais
+
+* **`developer_tools/scripts/presentation_cover_local.ps1`**: Novo script para rodar a demo de apresentação localmente, utilizando um orquestrador dedicado (`orquestrador_local.py`).
+* **`developer_tools/scripts/run_tests_local.bat`**: Script batch dedicado para execução da suíte de testes em ambiente local (`localhost`).
+* **`developer_tools/scripts/local_test_graphql.py`**: Novo teste de conectividade GraphQL específico para validação local, sem dependência da OCI.
+* **Isolamento de Ambiente**: Scripts ajustados para garantir que testes locais não tentem conectar acidentalmente na infraestrutura OCI.
+
 ### 📚 Documentação
 
 * **Pasta `/docs`**: Centralização de todos os arquivos de documentação (13 arquivos .md).
