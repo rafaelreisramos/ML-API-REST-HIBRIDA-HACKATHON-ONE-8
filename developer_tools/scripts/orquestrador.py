@@ -202,8 +202,8 @@ def main():
             input("\nEnter para continuar...")
         
         elif opt == "2":
-            # Roda o demo dashboard no contexto da pasta dele (importante para achar o CSV se o path for relativo)
-            subprocess.call(["python", "demo_dashboard.py"], cwd=r"developer_tools\scripts")
+            # Roda demo dashboard a partir da raiz para encontrar docs/csv
+            subprocess.call(["python", r"developer_tools\scripts\demo_dashboard.py"])
             input("\nEnter para continuar...")
             
         elif opt == "3":
