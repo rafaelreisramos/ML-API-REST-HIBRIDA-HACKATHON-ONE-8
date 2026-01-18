@@ -38,6 +38,7 @@ if defined OCI_PATH (
 ) else (
     set "OCI_EXE=oci"
 )
+set "OCI_FLAGS=--auth security_token"
 
 color 0B
 title VIBECODE OCI CONTROLLER [Initializing...]
@@ -117,7 +118,7 @@ call :LOG "User requested VM START."
 
 :: Check status
 echo [*] Checking current state...
-for /f "tokens=*" %%i in ('oci compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output') do set STATUS=%%i
+for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output %OCI_FLAGS%') do set STATUS=%%i
 
 if "%STATUS%"=="RUNNING" (
     echo [INFO] Instance is already RUNNING.
@@ -127,7 +128,7 @@ if "%STATUS%"=="RUNNING" (
 )
 
 echo [*] Sending START signal to OCI Control Plane...
-call !OCI_EXE! compute instance action --instance-id %INSTANCE_OCID% --action START >nul
+call !OCI_EXE! compute instance action --instance-id %INSTANCE_OCID% --action START %OCI_FLAGS% >nul
 if %errorlevel% equ 0 (
     echo [SUCCESS] Start signal sent. Instance is provisioning.
     call :LOG "VM Start command executed successfully."
@@ -146,7 +147,7 @@ echo [VIBECODE] Initiating OCI Shutdown Sequence...
 call :LOG "User requested VM STOP."
 
 echo [*] Requesting SOFTSTOP...
-call !OCI_EXE! compute instance action --instance-id %INSTANCE_OCID% --action SOFTSTOP >nul
+call !OCI_EXE! compute instance action --instance-id %INSTANCE_OCID% --action SOFTSTOP %OCI_FLAGS% >nul
 if %errorlevel% equ 0 (
     echo [SUCCESS] Stop signal sent. Instance is stopping.
     call :LOG "VM Stop command executed successfully."
@@ -165,19 +166,19 @@ call :LOG "User requested STATUS check."
 echo.
 
 :: Get Status
-for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output') do set STATUS=%%i
+for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output %OCI_FLAGS%') do set STATUS=%%i
 echo   Status     : %STATUS%
 call :LOG "VM Status: %STATUS%"
 
 :: Get Shape
-for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.shape" --raw-output') do set SHAPE=%%i
+for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.shape" --raw-output %OCI_FLAGS%') do set SHAPE=%%i
 echo   Shape      : %SHAPE%
 
 if "%STATUS%"=="RUNNING" (
     echo.
     echo   [*] Fetching Public IP...
     :: Complex logic to find Public IP via VNIC attachments
-    for /f "tokens=*" %%i in ('!OCI_EXE! compute instance list-vnics --instance-id %INSTANCE_OCID% --query "data[0].\"public-ip\"" --raw-output') do set PUBLIC_IP=%%i
+    for /f "tokens=*" %%i in ('!OCI_EXE! compute instance list-vnics --instance-id %INSTANCE_OCID% --query "data[0].\"public-ip\"" --raw-output %OCI_FLAGS%') do set PUBLIC_IP=%%i
     echo   Public IP  : !PUBLIC_IP!
 )
 
@@ -194,7 +195,7 @@ call :LOG "User requested SSH connection."
 
 :: 1. Check if Running
 echo [*] Verifying instance state...
-for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output') do set STATUS=%%i
+for /f "tokens=*" %%i in ('!OCI_EXE! compute instance get --instance-id %INSTANCE_OCID% --query "data.\"lifecycle-state\"" --raw-output %OCI_FLAGS%') do set STATUS=%%i
 
 if "%STATUS%" NEQ "RUNNING" (
     color 0E
@@ -208,7 +209,7 @@ if "%STATUS%" NEQ "RUNNING" (
 
 :: 2. Get Public IP dynamically
 echo [*] resolving Public IP Address...
-for /f "tokens=*" %%i in ('!OCI_EXE! compute instance list-vnics --instance-id %INSTANCE_OCID% --query "data[0].\"public-ip\"" --raw-output') do set PUBLIC_IP=%%i
+for /f "tokens=*" %%i in ('!OCI_EXE! compute instance list-vnics --instance-id %INSTANCE_OCID% --query "data[0].\"public-ip\"" --raw-output %OCI_FLAGS%') do set PUBLIC_IP=%%i
 
 if "%PUBLIC_IP%"=="" (
     echo [ERROR] Could not resolve Public IP. Check if instance has a public IP assigned.

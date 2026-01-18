@@ -95,3 +95,7 @@ teste_risco_alto.csv
 error_log.txt
 OCI_ACCESS_INFO.md
 .oci/
+
+# Sensitive Configuration
+config.bat
+OCI_VM-Control/config.bat
