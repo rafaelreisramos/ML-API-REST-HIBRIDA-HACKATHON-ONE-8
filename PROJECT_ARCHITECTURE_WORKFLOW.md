@@ -1,51 +1,161 @@
-# 🌍 Próximos Passos: Infraestrutura OCI com Terraform
+# 🗺️ Arquitetura E2E & Workflow Visual - ChurnInsight
 
-Este documento define o escopo para a provisão da infraestrutura do **ChurnInsight** na **Oracle Cloud Infrastructure (OCI)**.
+Este documento apresenta a infraestrutura completa, o pipeline de deployment e os fluxos de dados da aplicação **ChurnInsight** na Oracle Cloud Infrastructure (OCI).
 
-## 🎯 Objetivo
+> **Para Modelo NanoBanana**: Use os códigos Mermaid abaixo para gerar visualizações ricas da topologia.
 
-Migrar a aplicação para a OCI utilizando Terraform, garantindo uma arquitetura robusta, segura e escalável, aproveitando o poder da nuvem Oracle.
+## 🏗️ Topologia da Infraestrutura (Mermaid Graph)
 
-## 🏗️ Arquitetura Alvo (OCI - Oracle Cloud)
+Visão completa desde o usuário até a infraestrutura na nuvem.
 
-### 1. Rede e Segurança (Networking)
+```mermaid
+%% Arquitetura E2E OCI ChurnInsight
+graph TD
+    %% Estilos
+    classDef cloud fill:#f9f9f9,stroke:#333,stroke-width:2px,color:black;
+    classDef compute fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:black;
+    classDef container fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:black;
+    classDef db fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,stroke-dasharray: 5 5,color:black;
+    classDef actor fill:#eceff1,stroke:#455a64,stroke-width:2px,color:black;
 
-* **VCN (Virtual Cloud Network)**: Criação de uma rede isolada na região.
-* **Subnets**: Separação entre pública (Load Balancer) e privada (Aplicações e Banco).
-* **Security Lists / NSGs**: Controle fino de tráfego (Firewall virtual).
+    %% Atores Externos
+    User((👤 Usuário)):::actor
+    Dev((👨‍💻 Desenvolvedor)):::actor
 
-### 2. Computação (Compute & Containers)
+    %% Infraestrutura OCI
+    subgraph OCI_Cloud ["☁️ Oracle Cloud Infrastructure (OCI)"]
+        direction TB
+        
+        %% Redes e Segurança
+        subgraph VCN ["🔒 VCN (10.0.0.0/16)"]
+            
+            IGW[🌐 Internet Gateway]
+            
+            %% Instância Principal (Onde roda o Docker Compose)
+            subgraph VM_Compute ["🖥️ VM App Server (OCI Instance 1)"]
+                direction TB
+                
+                %% Camada de Borda (HTTPS)
+                Traefik["🚦 Traefik Proxy<br/>(SSL/TLS Auto - nip.io)<br/>Port: 80/443"]:::container
+                
+                %% Camada de Aplicação (Docker Compose Network)
+                subgraph Docker_Network ["🐳 Internal Docker Network"]
+                    Frontend["⚛️ Frontend UI<br/>(React + Nginx)<br/>Port: 80"]:::container
+                    
+                    subgraph Backend_Cluster ["⚙️ Backend Services"]
+                        ApiJava["☕ Backend API<br/>(Spring Boot 3)<br/>Port: 9999"]:::container
+                        AiPython["🐍 AI Service<br/>(Flask + Scikit-Learn)<br/>Port: 5000"]:::container
+                    end
+                    
+                    DB[(🗄️ PostgreSQL / H2<br/>Database)]:::db
+                end
+            end
 
-* **OCIR (OCI Registry)**: Armazenamento seguro das imagens Docker (`backend`, `ai-service`, `frontend`).
-* **OCI Container Instances**: Execução de containers serverless para alta performance e simplicidade de gestão (sem necessidade de gerenciar VMs).
-  * *Alternativa Enterprise*: **OKE (Oracle Kubernetes Engine)** para orquestração avançada.
+            %% Instância Secundária (Provisionada pelo Terraform, mas containers não distribuídos ainda)
+            subgraph VM_AI ["🖥️ VM AI Server (OCI Instance 2)"]
+                AiStandalone["🐍 AI Service (Standby)<br/>Reserved for Scale-out"]:::compute
+            end
+        end
+    end
 
-### 3. Banco de Dados (Persistence)
+    %% Pipeline DevOps
+    subgraph Pipeline ["🚀 Deployment Pipeline"]
+        Git[📂 GitHub Repo]
+        Terraform[🏗️ Terraform]
+        SSH[🔑 SSH Access]
+    end
 
-* **OCI Database for PostgreSQL**: Serviço gerenciado de PostgreSQL da Oracle.
-  * Alta disponibilidade e backups automáticos.
-  * Integração nativa com a VCN para segurança máxima (sem acesso público).
+    %% Conexões de Deploy
+    Dev -->|Commit/Push| Git
+    Dev -->|Plan/Apply| Terraform
+    Terraform -->|Provisiona| VCN
+    Terraform -->|Configura| VM_Compute
+    Git -->|Git Pull| VM_Compute
+    Dev -->|SSH Connection| VM_Compute
 
-### 4. Entrega e Acesso
+    %% Conexões de Rede OCI
+    User ==>|HTTPS Request| IGW
+    IGW ==>|Route Table| Traefik
 
-* **OCI Load Balancer**: Balanceamento de carga Layer 7 (HTTP/HTTPS) distribuindo tráfego para as instâncias de container.
-* **WAF (Web Application Firewall)**: Proteção contra ataques web no Load Balancer.
+    %% Roteamento Interno Traefik
+    Traefik -->|Host: *.nip.io| Frontend
+    Traefik -->|/api/* OR /login| ApiJava
 
-## 📋 Checklist Terraform para OCI
+    %% Fluxo de Dados Aplicação
+    Frontend -.->|Fetch API| Traefik
+    ApiJava <-->|JPA| DB
+    ApiJava <-->|HTTP Predição| AiPython
 
-Na próxima sessão, focaremos em:
-
-* [ ] **OCI Provider**: Configuração de autenticação (Tenancy OCID, User OCID, Private Key).
-* [ ] **Compartments**: Organização lógica dos recursos (ex: `Hackathon_Project`).
-* [ ] **Networking Module**: Criação da VCN, Internet Gateway (IGW), NAT Gateway e Route Tables.
-* [ ] **Database Module**: Provisionamento do cluster PostgreSQL gerenciado.
-* [ ] **Compute Module**: Definição das Container Instances com injeção de variáveis de ambiente.
-
-## 🚀 Diferenciais OCI
-
-* **Custo-Benefício**: Aproveitar instâncias ARM (Ampere) se compatível, ou Flex Shapes.
-* **Performance**: Rede de baixa latência da OCI.
-* **Segurança**: Criptografia por padrão (at rest e in transit).
+    %% Classes
+    class OCI_Cloud cloud;
+    class VM_Compute compute;
+```
 
 ---
-*Documento atualizado para OCI.*
+
+## 🔄 Fluxo de Negócio E2E: Análise de Churn (Sequence Diagram)
+
+Detalhamento de como um arquivo CSV se transforma em insights de negócio.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    
+    actor U as 👤 Usuário
+    participant P as 🚦 Traefik (Proxy)
+    participant F as ⚛️ Frontend (React)
+    participant B as ☕ Backend (Spring Security)
+    participant A as 🐍 AI Service (Python)
+    participant D as 🗄️ Database
+
+    box rgb(240, 248, 255) "Autenticação"
+    U->>P: Acessa https://...nip.io
+    P->>F: Serve Aplicação React
+    U->>F: Preenche Login (admin/123456)
+    F->>P: POST /login
+    P->>B: Encaminha Requisição
+    B->>B: Valida Credenciais (Spring Security)
+    B-->>F: Retorna Token JWT (200 OK)
+    end
+
+    box rgb(255, 248, 240) "Processamento Batch (E2E)"
+    U->>F: Upload CSV Clientes
+    F->>P: POST /api/churn/upload (Multipart)
+    P->>B: Encaminha com Token
+    B->>B: Valida Token & Parse CSV
+    B->>D: Salva Dados Brutos (Transacional)
+    
+    par Processamento Assíncrono / Rápido
+        B->>A: POST /predict (Lista de Clientes)
+        Note right of A: Modelo Random Forest<br/>Calcula Probabilidade
+        A-->>B: Retorna [Score, Classe]
+    end
+    
+    B->>D: Atualiza Clientes com Score de Churn
+    B-->>F: Retorna JSON (Status Processamento)
+    end
+
+    box rgb(240, 255, 240) "Visualização"
+    F->>P: GET /api/dashboard/metrics
+    P->>B: Request Métricas
+    B->>D: Query SQL (Agregação)
+    D-->>B: Dados Consolidados
+    B-->>F: JSON Métricas
+    F-->>U: Renderiza Gráficos & KPIs
+    end
+```
+
+## 🛠️ Stack Tecnológico
+
+| Camada | Tecnologia | Função |
+| :--- | :--- | :--- |
+| **Infra OCI** | Terraform | Código para criar VCN, Security Lists, VM |
+| **Proxy** | Traefik | SSL Automático (Let's Encrypt), Roteamento |
+| **Frontend** | React + Vite | Interface do Usuário, Dashboard |
+| **Backend** | Spring Boot 3 | API REST, Segurança (JWT), Orquestração |
+| **IA/ML** | Python (Flask) | Modelo Preditivo, Scikit-Learn |
+| **Dados** | PostgreSQL | Persistência Relacional |
+| **OS** | Oracle Linux 8 | Sistema Operacional da VM |
+
+---
+*Gerado para documentação visual do projeto ChurnInsight.*
