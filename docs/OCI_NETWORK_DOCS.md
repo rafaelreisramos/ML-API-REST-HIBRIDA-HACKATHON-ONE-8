@@ -9,23 +9,23 @@ A topologia utiliza uma **Virtual Cloud Network (VCN)** única com uma **Subnet 
 ```mermaid
 graph TD
     Internet((Internet)) --> IGW[Internet Gateway]
-    IGW --> RouteTable[Route Table Public]
-    RouteTable --> SubnetPublic[Subnet Pública: 10.0.1.0/24]
+    IGW --> RouteTable["Route Table (Public)"]
+    RouteTable --> SubnetPublicNode["Subnet Pública: 10.0.1.0/24"]
     
-    subgraph VCN [VCN: 10.0.0.0/16]
-        subgraph SubnetPublic
-            AppServer[App Server<br/>(Front + Back)<br/>IP: Public]
-            AIServer[AI Server<br/>(Python ML)<br/>IP: Public]
+    subgraph VCN ["VCN: 10.0.0.0/16"]
+        subgraph SubnetPublic ["Subnet Pública"]
+            AppServer["App Server (Front + Back)"]
+            AIServer["AI Server (Python ML)"]
         end
         
-        AppServer -- HTTP :5000 --> AIServer
+        AppServer -- "HTTP :5000" --> AIServer
     end
 
-    User(Usuário) -- HTTP :80 --> AppServer
-    User -- HTTPS :443 --> AppServer
-    User -- API :9999 --> AppServer
-    Admin(Admin) -- SSH :22 --> AppServer
-    Admin -- SSH :22 --> AIServer
+    User("Usuário") -- "HTTP :80" --> AppServer
+    User -- "HTTPS :443" --> AppServer
+    User -- "API :9999" --> AppServer
+    Admin("Admin") -- "SSH :22" --> AppServer
+    Admin -- "SSH :22" --> AIServer
 ```
 
 ---
@@ -92,7 +92,7 @@ As regras de firewall são aplicadas no nível da sub-rede via **Security Lists*
 
 ## 📝 Como modificar
 
-Toda a definição de rede está codificada no arquivo `oci-pipeline/terraform/main.tf`.
+Toda a definição de rede está codificada no arquivo `../oci-pipeline/terraform/main.tf`.
 
 Para adicionar uma nova porta (ex: Banco de Dados na 5432):
 

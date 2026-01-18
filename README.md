@@ -23,15 +23,36 @@ Diferente de soluções simples, este sistema é **Full-Stack e Híbrido**:
 
 ---
 
-## 📚 Documentação Completa
+## 📚 Mapa da Documentação
 
-Para detalhes específicos, consulte nossos guias oficiais incluídos neste repositório:
+Abaixo você encontra o mapa completo de documentação técnica e funcional do projeto:
 
-| Documento | Descrição |
-| :--- | :--- |
-| [📘 Manual de Uso](./MANUAL_DE_USO.md) | Guia para o usuário final: como navegar, interpretar gráficos e usar o simulador. |
-| [📡 Documentação da API](./API_DOCUMENTATION.md) | Swagger, Endpoints, Schemas GraphQL e exemplos de cURL. |
-| [🏛️ Decisões de Arquitetura](./DECISOES_ARQUITETURA.md) | Por que usamos Java + Python? Por que 2 bancos de dados? Leia aqui. |
+### 📖 Guia do Usuário e API
+
+* [📘 **Manual de Uso**](./docs/MANUAL_DE_USO.md): Guia para o usuário final e navegação no Dashboard.
+* [📡 **Documentação da API**](./docs/API_DOCUMENTATION.md): Detalhes de Endpoints, Schemas GraphQL e Exemplos.
+* [🛠️ **Manual de Erros**](./docs/MANUAL_DE_ERROS.md): Guia de Troubleshooting e resolução de problemas comuns.
+
+### 🏗️ Arquitetura e Decisões Técnicas
+
+* [🏛️ **Decisões de Arquitetura**](./docs/DECISOES_ARQUITETURA.md): Justificativas para a escolha da stack e padrões.
+* [📐 **Arquitetura do Sistema**](./docs/ARCHITECTURE.md): Detalhes sobre o padrão *Double-Write* e persistência.
+* [🔄 **Workflow Visual E2E**](./docs/PROJECT_ARCHITECTURE_WORKFLOW.md): Diagramas de sequência e fluxos de dados completos.
+* [🖼️ **Prompt de Arquitetura**](./docs/PROMPT_ARCHITECTURE_IMAGE.md): Prompt utilizado para gerar as visualizações da arquitetura.
+
+### ☁️ Infraestrutura e Cloud (OCI)
+
+* [🌐 **Guia de Rede OCI**](./docs/OCI_NETWORK_DOCS.md): Detalhes de VCN, Subnets e Security Lists.
+* [🔑 **Informações de Acesso**](./docs/OCI_ACCESS_INFO.md): Credenciais e IPs da infraestrutura na nuvem.
+* [🚀 **Pipeline OCI**](./oci-pipeline/README.md): Instruções sobre o provisionamento via Terraform.
+
+### 🛡️ Segurança e Operações
+
+* [🔐 **Guia de Segurança**](./docs/SECURITY_GUIDE.md): Práticas de proteção de dados e autenticação JWT.
+* [🌐 **Configuração HTTPS**](./docs/HTTPS_CONFIGURATION.md): Detalhes sobre SSL/TLS e Traefik.
+* [🧪 **Evidências de Teste HTTPS**](./docs/TESTE_HTTPS.md): Relatório de validação da camada segura.
+* [📜 **Changelog**](./docs/CHANGELOG.md): Histórico de versões e melhorias.
+* [📊 **Relatório de Status**](./docs/RELATORIO_STATUS.md): Estado atual da entrega e funcionalidades.
 
 ---
 
@@ -74,7 +95,7 @@ docker-compose up -d --build
 
 * **Frontend (Dashboard):** [http://localhost](http://localhost)
 * **Login:** `admin`
-* **Senha:** `123`
+* **Senha:** `123456`
 
 **Links de Desenvolvimento:**
 
@@ -97,7 +118,7 @@ O projeto inclui scripts Terraform para deploy na Oracle Cloud Infrastructure (O
 
 * **Localização:** `oci-pipeline/terraform/`
 * **Controle de VMs:** `OCI_VM-Control/CONTROLE_OCI.bat`
-* **Documentação:** Veja `OCI_ACCESS_INFO.md` e `OCI_NETWORK_DOCS.md`
+* **Documentação:** Veja [OCI_ACCESS_INFO.md](docs/OCI_ACCESS_INFO.md) e [OCI_NETWORK_DOCS.md](docs/OCI_NETWORK_DOCS.md)
 
 ---
 
@@ -194,4 +215,5 @@ O upload de CSVs não bloqueia o servidor. Utilizamos `CompletableFuture` e Pool
 
 ---
 
-**Desenvolvido pela Equipe G8**
+---
+*Desenvolvido pela Equipe G8 - Hackathon Alura 2026*

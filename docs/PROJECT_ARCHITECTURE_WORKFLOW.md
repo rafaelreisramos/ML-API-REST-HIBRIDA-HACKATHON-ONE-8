@@ -19,8 +19,8 @@ graph TD
     classDef actor fill:#eceff1,stroke:#455a64,stroke-width:2px,color:black;
 
     %% Atores Externos
-    User((👤 Usuário)):::actor
-    Dev((👨‍💻 Desenvolvedor)):::actor
+    User(("👤 Usuário")):::actor
+    Dev(("👨‍💻 Desenvolvedor")):::actor
 
     %% Infraestrutura OCI
     subgraph OCI_Cloud ["☁️ Oracle Cloud Infrastructure (OCI)"]
@@ -29,40 +29,40 @@ graph TD
         %% Redes e Segurança
         subgraph VCN ["🔒 VCN (10.0.0.0/16)"]
             
-            IGW[🌐 Internet Gateway]
+            IGW["🌐 Internet Gateway"]
             
             %% Instância Principal (Onde roda o Docker Compose)
             subgraph VM_Compute ["🖥️ VM App Server (OCI Instance 1)"]
                 direction TB
                 
                 %% Camada de Borda (HTTPS)
-                Traefik["🚦 Traefik Proxy<br/>(SSL/TLS Auto - nip.io)<br/>Port: 80/443"]:::container
+                Traefik["🚦 Traefik Proxy (SSL/TLS Auto - nip.io) Port: 80/443"]:::container
                 
                 %% Camada de Aplicação (Docker Compose Network)
                 subgraph Docker_Network ["🐳 Internal Docker Network"]
-                    Frontend["⚛️ Frontend UI<br/>(React + Nginx)<br/>Port: 80"]:::container
+                    Frontend["⚛️ Frontend UI (React + Nginx) Port: 80"]:::container
                     
                     subgraph Backend_Cluster ["⚙️ Backend Services"]
-                        ApiJava["☕ Backend API<br/>(Spring Boot 3)<br/>Port: 9999"]:::container
-                        AiPython["🐍 AI Service<br/>(Flask + Scikit-Learn)<br/>Port: 5000"]:::container
+                        ApiJava["☕ Backend API (Spring Boot 3) Port: 9999"]:::container
+                        AiPython["🐍 AI Service (Flask + ML) Port: 5000"]:::container
                     end
                     
-                    DB[(🗄️ PostgreSQL / H2<br/>Database)]:::db
+                    DB[("🗄️ PostgreSQL / H2 Database")]:::db
                 end
             end
 
             %% Instância Secundária (Provisionada pelo Terraform, mas containers não distribuídos ainda)
             subgraph VM_AI ["🖥️ VM AI Server (OCI Instance 2)"]
-                AiStandalone["🐍 AI Service (Standby)<br/>Reserved for Scale-out"]:::compute
+                AiStandalone["🐍 AI Service - Standby (Scale-out)"]:::compute
             end
         end
     end
 
     %% Pipeline DevOps
     subgraph Pipeline ["🚀 Deployment Pipeline"]
-        Git[📂 GitHub Repo]
-        Terraform[🏗️ Terraform]
-        SSH[🔑 SSH Access]
+        Git["📂 GitHub Repo"]
+        Terraform["🏗️ Terraform"]
+        SSH["🔑 SSH Access"]
     end
 
     %% Conexões de Deploy
@@ -101,14 +101,15 @@ Detalhamento de como um arquivo CSV se transforma em insights de negócio.
 sequenceDiagram
     autonumber
     
-    actor U as 👤 Usuário
-    participant P as 🚦 Traefik (Proxy)
-    participant F as ⚛️ Frontend (React)
-    participant B as ☕ Backend (Spring Security)
-    participant A as 🐍 AI Service (Python)
-    participant D as 🗄️ Database
+    participant U as "👤 Usuário"
+    participant P as "🚦 Traefik (Proxy)"
+    participant F as "⚛️ Frontend (React)"
+    participant B as "☕ Backend (Spring Security)"
+    participant A as "🐍 AI Service (Python)"
+    participant D as "🗄️ Database"
 
-    box rgb(240, 248, 255) "Autenticação"
+    rect rgb(240, 248, 255)
+    Note over U,D: Autenticação
     U->>P: Acessa https://...nip.io
     P->>F: Serve Aplicação React
     U->>F: Preenche Login (admin/123456)
@@ -118,7 +119,8 @@ sequenceDiagram
     B-->>F: Retorna Token JWT (200 OK)
     end
 
-    box rgb(255, 248, 240) "Processamento Batch (E2E)"
+    rect rgb(255, 248, 240)
+    Note over U,D: Processamento Batch (E2E)
     U->>F: Upload CSV Clientes
     F->>P: POST /api/churn/upload (Multipart)
     P->>B: Encaminha com Token
@@ -127,7 +129,7 @@ sequenceDiagram
     
     par Processamento Assíncrono / Rápido
         B->>A: POST /predict (Lista de Clientes)
-        Note right of A: Modelo Random Forest<br/>Calcula Probabilidade
+        Note right of A: Modelo Random Forest - Calcula Probabilidade
         A-->>B: Retorna [Score, Classe]
     end
     
@@ -135,7 +137,8 @@ sequenceDiagram
     B-->>F: Retorna JSON (Status Processamento)
     end
 
-    box rgb(240, 255, 240) "Visualização"
+    rect rgb(240, 255, 240)
+    Note over U,D: Visualização
     F->>P: GET /api/dashboard/metrics
     P->>B: Request Métricas
     B->>D: Query SQL (Agregação)

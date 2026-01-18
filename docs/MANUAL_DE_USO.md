@@ -11,7 +11,15 @@ O sistema é protegido por autenticação.
 * **URL de Acesso:** [http://localhost:3000](http://localhost:3000) (ou porta 80)
 * **Credenciais (Admin):**
   * **Usuário:** `admin`
-  * **Senha:** `123`
+  * **Senha:** `123456`
+
+### 🆕 Criando Novos Usuários
+
+Além do acesso administrativo padrão, o sistema permite a criação de novos usuários diretamente pela interface:
+
+1. Na tela de login, clique em **"Cadastrar-se"** (ou acesse a aba lateral de Usuários após logar).
+2. Preencha o login e a senha desejada.
+3. O novo usuário terá acesso imediato às ferramentas de predição.
 
 > **Nota:** Se for o primeiro acesso, pode levar alguns segundos para carregar o dashboard enquanto os serviços "esquentam".
 
