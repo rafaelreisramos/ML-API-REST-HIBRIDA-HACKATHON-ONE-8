@@ -2,7 +2,7 @@
 
 Este documento apresenta a infraestrutura completa, o pipeline de deployment e os fluxos de dados da aplicação **ChurnInsight** na Oracle Cloud Infrastructure (OCI).
 
-> **Para Modelo NanoBanana**: Use os códigos Mermaid abaixo para gerar visualizações ricas da topologia.
+
 
 ## 🏗️ Topologia da Infraestrutura (Mermaid Graph)
 
