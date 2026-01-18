@@ -114,5 +114,27 @@ O sistema classifica o risco em 3 faixas baseadas na probabilidade calculada:
 
 ---
 
+## 🎬 5. Modo Apresentação (Demonstração Técnica)
+
+Para apresentações de vendas ou validações técnicas, o sistema possui um modo "Demo Live" que roda no terminal e simula cenários de alta carga.
+
+### Como Iniciar (Windows)
+
+1. Certifique-se que o Docker está rodando localmente.
+2. Abra o PowerShell na pasta do projeto e execute:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File developer_tools/scripts/presentation_cover_local.ps1
+```
+
+1. Pressione **ENTER** e escolha o cenário desejado no menu.
+
+### Funcionalidades da Demo
+
+* **Demo Executiva (Opção 2):** Processa dados reais, calcula a **Receita em Risco (R$)** e exibe alertas coloridos no terminal, simulando o monitoramento da equipe de suporte.
+* **Stress Test (Opção 3):** Gera 50.000 requisições sintéticas em alta velocidade para demonstrar a robustez e o processamento paralelo da arquitetura.
+
+---
+
 **Equipe G8 - Hackathon Alura**
 *Tecnologia e Dados a serviço da retenção.*
