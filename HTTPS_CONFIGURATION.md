@@ -242,6 +242,27 @@ add_header X-Content-Type-Options "nosniff" always;
 add_header X-XSS-Protection "1; mode=block" always;
 ```
 
+### Troubleshooting Comum
+
+#### Login Travado / Timeout no Backend
+
+Se o login funcionar rapidamente localmente mas travar na VM, especialmente ao usar criptografia (BCrypt, SSL, JWT), pode ser falta de entropia na VM Linux.
+**Sintoma**: Logs param em "Started Application" e requisições de Login dão timeout.
+**Solução**: Adicionar a opção Java para usar `/dev/urandom` (não bloqueante):
+
+```yaml
+environment:
+  - JAVA_TOOL_OPTIONS=-Djava.security.egd=file:/dev/./urandom
+```
+
+Esta configuração já foi aplicada no `docker-compose.yml`.
+
+#### Erro "Invalid CORS request" ou 403 Forbidden no Login
+
+Ao acessar via HTTPS (domínio diferente da API interna), o navegador exige headers CORS. O Spring Security pode bloquear requisições antes mesmo delas chegarem ao Controller se a origem não for explicitamente permitida.
+**Sintoma**: Login funciona via `curl` mas falha no navegador com erro de CORS ou 403.
+**Solução**: Configurar CORS permissivo no Spring Security (`SecurityConfiguration.java`) para que ele sempre responda com `Access-Control-Allow-Origin: *`, independente de erros. A segurança é garantida pelo Token JWT, não pelo bloqueio de origem.
+
 ### Rate Limiting (Futuro)
 
 Para produção de alta escala, considere adicionar ao Traefik:
