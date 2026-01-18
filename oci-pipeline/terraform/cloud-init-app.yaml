@@ -35,7 +35,19 @@ runcmd:
   - firewall-cmd --permanent --add-port=9999/tcp
   - firewall-cmd --reload
 
-  # 6. Build e Start (usando docker-compose.yml padrão do repo)
+  # 6. Preparar Traefik (HTTPS com nip.io)
+  - echo "🔒 Configurando HTTPS com Traefik e nip.io..."
+  - mkdir -p /opt/churninsight/letsencrypt
+  - touch /opt/churninsight/letsencrypt/acme.json
+  - chmod 600 /opt/churninsight/letsencrypt/acme.json
+
+  # 7. Obter IP Público e Configurar Ambiente
+  - export PUBLIC_IP=$(curl -s ifconfig.me)
+  - echo "🌐 IP Público detectado: $PUBLIC_IP"
+  - echo "DOMAIN=$PUBLIC_IP.nip.io" > /opt/churninsight/.env
+  - echo "Criado arquivo .env com DOMAIN=$PUBLIC_IP.nip.io"
+
+  # 8. Build e Start
   - echo "🏗️ Subindo Aplicação..."
   - /usr/local/bin/docker-compose up -d --build
 
