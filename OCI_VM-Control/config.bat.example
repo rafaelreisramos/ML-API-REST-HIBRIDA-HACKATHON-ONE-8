@@ -1,0 +1,33 @@
+@echo off
+:: =============================================
+::  VIBECODE OCI CONTROLLER - CONFIGURATION FILE
+:: =============================================
+::  Rename this file to: config.bat
+::  Fill in the values below with your OCI project info.
+:: =============================================
+
+:: --- [ OCI INSTANCE SETTINGS ] ---
+:: OCID da Instância (Obtenha via 'terraform output' ou Console OCI)
+:: Exemplo: ocid1.instance.oc1.sa-saopaulo-1.an...
+set "INSTANCE_OCID=ocid1.instance.oc1.sa-saopaulo-1.antxeljrmgi33kacidu3oz4hozvgsrezank7gz3uhervxhm5442ujyxlfzia"
+
+:: --- [ SSH CONNECTION ] ---
+:: Caminho completo para sua chave privada SSH
+:: Se estiver na pasta do usuário, use %USERPROFILE%
+set "SSH_KEY_PATH=%USERPROFILE%\.ssh\id_ed25519"
+
+:: Usuário SSH (Padrão para Oracle Linux: opc, Ubuntu: ubuntu)
+set "SSH_USER=opc"
+
+:: --- [ FINOPS ] ---
+:: Custo estimado por hora (USD)
+:: VM.Standard3.Flex (2 OCPU + 8GB) ~= $0.10/hora
+set "COST_PER_HOUR=0.10"
+
+:: --- [ SYSTEM ] ---
+:: Caminho para o executável OCI CLI (caso não esteja no PATH global)
+:: Deixe em branco se 'oci' já funciona no terminal
+set "OCI_PATH="
+
+:: Nome do arquivo de log
+set "LOG_FILE=vibecode_oci_control.log"

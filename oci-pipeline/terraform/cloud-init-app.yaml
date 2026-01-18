@@ -1,88 +1,42 @@
 #cloud-config
-# Cloud-init para App Server (Frontend + Backend)
+# Cloud-init para App Server (Frontend + Backend) - CORRIGIDO E ROBUSTO
 
 package_update: true
-package_upgrade: true
-
-packages:
-  - docker
-  - docker-compose
-  - git
-  - nginx
+package_upgrade: false
 
 runcmd:
-  # Iniciar Docker
-  - systemctl enable docker
-  - systemctl start docker
-
-  # Adicionar usuário opc ao grupo docker
+  # 1. Instalar Docker CE (Método Oficial)
+  - echo "📦 Instalando Dependências Docker..."
+  - dnf install -y dnf-utils zip unzip git
+  - dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+  - dnf install -y docker-ce docker-ce-cli containerd.io
+  - systemctl enable --now docker
   - usermod -aG docker opc
 
-  # Criar diretórios
+  # 2. Instalar Docker Compose V2 (Standalone)
+  - echo "📦 Instalando Docker Compose..."
+  - curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  - ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+  # 3. Preparar Diretório
   - mkdir -p /opt/churninsight
+  - chown -R opc:opc /opt/churninsight
   - cd /opt/churninsight
 
-  # Clonar repositório (substitua pela URL real)
+  # 4. Clonar Repositório (Branch Main)
+  - echo "🚀 Clonando Repositório..."
   - git clone https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8.git .
 
-  # Configurar variáveis de ambiente
-  - echo "ML_SERVICE_URL=http://AI_SERVER_IP:5000" > .env
-  - echo "SERVER_PORT=9999" >> .env
-
-  # Build do Backend
-  - docker build -t churninsight-backend:latest -f Dockerfile.backend .
-
-  # Build do Frontend
-  - docker build -t churninsight-frontend:latest frontend/
-
-  # Criar docker-compose.yml para produção
-  - |
-    cat > docker-compose.prod.yml <<EOF
-    version: '3.8'
-    services:
-      backend:
-        image: churninsight-backend:latest
-        container_name: backend
-        ports:
-          - "9999:9999"
-        environment:
-          - ML_SERVICE_URL=http://AI_SERVER_IP:5000
-          - SPRING_PROFILES_ACTIVE=prod
-        restart: unless-stopped
-      
-      frontend:
-        image: churninsight-frontend:latest
-        container_name: frontend
-        ports:
-          - "80:80"
-        restart: unless-stopped
-    EOF
-
-  # Iniciar serviços
-  - docker-compose -f docker-compose.prod.yml up -d
-
-  # Configurar firewall
-  - firewall-cmd --permanent --add-service=http
-  - firewall-cmd --permanent --add-service=https
+  # 5. Configurar Firewall
+  - echo "🛡️ Configurando Firewall..."
+  - firewall-cmd --permanent --add-port=80/tcp
+  - firewall-cmd --permanent --add-port=443/tcp
   - firewall-cmd --permanent --add-port=9999/tcp
   - firewall-cmd --reload
 
-write_files:
-  - path: /etc/systemd/system/churninsight.service
-    content: |
-      [Unit]
-      Description=ChurnInsight Application
-      After=docker.service
-      Requires=docker.service
+  # 6. Build e Start (usando docker-compose.yml padrão do repo)
+  - echo "🏗️ Subindo Aplicação..."
+  - /usr/local/bin/docker-compose up -d --build
 
-      [Service]
-      Type=oneshot
-      RemainAfterExit=yes
-      WorkingDirectory=/opt/churninsight
-      ExecStart=/usr/bin/docker-compose -f docker-compose.prod.yml up -d
-      ExecStop=/usr/bin/docker-compose -f docker-compose.prod.yml down
-
-      [Install]
-      WantedBy=multi-user.target
-
-final_message: "ChurnInsight App Server is ready!"
+final_message: "ChurnInsight App Server setup finished at $timestamp"
