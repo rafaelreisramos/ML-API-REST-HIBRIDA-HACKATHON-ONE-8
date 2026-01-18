@@ -24,8 +24,8 @@ set FAILED=0
 call :RunTest "local_test_graphql.py" "1. Connectivity and Schema Check (Local)"
 call :RunTest "test_api_e2e.py"     "2. End-to-End Flow Login Create Query"
 :: call :RunTest "verify_model_logic.py" "3. Business Logic Verification"
-call :RunTest "test_validation.py"  "4. Security Validation Negative Testing"
-call :RunTest "test_optimized_batch.py" "5. Batch Processing"
+call :RunTest "test_validation.py"  "3. Security Validation Negative Testing"
+call :RunTest "test_optimized_batch.py" "4. Batch Processing"
 
 echo.
 echo ============================================================================
