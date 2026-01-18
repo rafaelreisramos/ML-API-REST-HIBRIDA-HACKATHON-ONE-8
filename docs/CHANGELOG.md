@@ -1,8 +1,48 @@
 # Histórico de Mudanças (Changelog)
 
-## [2026-01-13] - Zero Config & OCI Production Ready
+## [2026-01-18] - Documentação e Organização do Projeto
 
-Finalização do projeto com foco em "Zero Configuration" para execução local e preparação total para deploy em nuvem (OCI).
+Reorganização completa da estrutura de arquivos e finalização da documentação.
+
+### 📚 Documentação
+
+* **Pasta `/docs`**: Centralização de todos os arquivos de documentação (13 arquivos .md).
+* **Pasta `/docs/csv`**: Organização dos arquivos CSV de teste e resultados.
+* **README Atualizado**: Mapa completo da documentação com links funcionais.
+* **Manual de Uso**: Atualizado com senha correta (123456) e fluxo de criação de usuários.
+
+### 🛠️ Scripts e Ferramentas
+
+* **Pasta `/developer_tools/scripts`**: Consolidação de 21 scripts (Python, PowerShell, Bash).
+* **Testes E2E**: Movidos para pasta centralizada.
+* **Scripts de Deploy**: Organizados junto com demais ferramentas.
+
+### 🔧 Correções
+
+* **Diagramas Mermaid**: Corrigidos erros de parse em `OCI_NETWORK_DOCS.md` e `PROJECT_ARCHITECTURE_WORKFLOW.md`.
+* **Links Quebrados**: Todos os links internos atualizados após reorganização.
+
+---
+
+## [2026-01-17] - Deploy OCI Enterprise
+
+Deploy da infraestrutura completa na Oracle Cloud com VMs Intel Flex.
+
+### ☁️ Infraestrutura OCI
+
+* **App Server**: VM.Standard3.Flex (2 vCPUs, 8GB RAM) - IP: 137.131.179.58
+* **AI Server**: VM.Standard3.Flex (4 vCPUs, 16GB RAM) - IP: 163.176.245.6
+* **Cloud-Init**: Configuração automática de Docker e aplicação.
+
+### 🔐 HTTPS Automático
+
+* **Traefik**: Configurado como reverse proxy com SSL/TLS.
+* **Let's Encrypt**: Certificados automáticos via nip.io.
+* **Docs**: Criado `HTTPS_CONFIGURATION.md` com guia completo.
+
+---
+
+## [2026-01-13] - Zero Config & OCI Production Ready
 
 ### 🚀 Infraestrutura & Cloud (OCI)
 

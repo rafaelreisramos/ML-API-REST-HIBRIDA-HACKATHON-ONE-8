@@ -38,7 +38,6 @@ Abaixo você encontra o mapa completo de documentação técnica e funcional do 
 * [🏛️ **Decisões de Arquitetura**](./docs/DECISOES_ARQUITETURA.md): Justificativas para a escolha da stack e padrões.
 * [📐 **Arquitetura do Sistema**](./docs/ARCHITECTURE.md): Detalhes sobre o padrão *Double-Write* e persistência.
 * [🔄 **Workflow Visual E2E**](./docs/PROJECT_ARCHITECTURE_WORKFLOW.md): Diagramas de sequência e fluxos de dados completos.
-* [🖼️ **Prompt de Arquitetura**](./docs/PROMPT_ARCHITECTURE_IMAGE.md): Prompt utilizado para gerar as visualizações da arquitetura.
 
 ### ☁️ Infraestrutura e Cloud (OCI)
 
