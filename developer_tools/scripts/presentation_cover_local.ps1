@@ -83,7 +83,8 @@ function Show-Enterprise-Dashboard {
     # Iniciar o Orquestrador Python HERDANDO a variavel API_URL local
     Push-Location $ProjectRoot
     $env:PYTHONIOENCODING = 'utf-8'
-    Start-Process python -ArgumentList "$ProjectRoot\developer_tools\scripts\orquestrador.py" -NoNewWindow -Wait
+    $orqScript = Join-Path $ProjectRoot "developer_tools\scripts\orquestrador.py"
+    Start-Process python -ArgumentList "`"$orqScript`"" -NoNewWindow -Wait
     Pop-Location
 }
 
