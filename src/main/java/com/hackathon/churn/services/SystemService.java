@@ -34,8 +34,8 @@ public class SystemService {
         health.put("service", "ChurnInsight API");
         health.put("version", "2.0.0");
 
-        // Verificar MongoDB
-        health.put("mongodb", verificarMongoDB());
+        // Verificar Database
+        health.put("database", verificarDatabase());
 
         // Verificar AI Service
         health.put("aiService", verificarAIService());
@@ -44,19 +44,19 @@ public class SystemService {
     }
 
     /**
-     * Verifica o status do MongoDB.
+     * Verifica o status do Banco de Dados.
      */
-    private Map<String, Object> verificarMongoDB() {
-        Map<String, Object> mongodb = new HashMap<>();
+    private Map<String, Object> verificarDatabase() {
+        Map<String, Object> db = new HashMap<>();
         try {
             long count = repository.count();
-            mongodb.put("status", "UP");
-            mongodb.put("totalDocuments", count);
+            db.put("status", "UP");
+            db.put("totalDocuments", count);
         } catch (Exception e) {
-            mongodb.put("status", "DOWN");
-            mongodb.put("error", e.getMessage());
+            db.put("status", "DOWN");
+            db.put("error", e.getMessage());
         }
-        return mongodb;
+        return db;
     }
 
     /**
