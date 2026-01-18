@@ -2,7 +2,12 @@ import urllib.request
 import json
 import sys
 
-URL = "http://localhost:9999/graphql"
+import os
+
+# Detecta URL via variável de ambiente (Default: localhost)
+BASE_URL = os.getenv("API_URL", "http://localhost:9999")
+URL = f"{BASE_URL}/graphql"
+print(f"📡 Testando em: {URL}")
 
 def run_query(query, variables=None):
     payload = {"query": query}
