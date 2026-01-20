@@ -133,7 +133,7 @@ O projeto inclui scripts Terraform para deploy na Oracle Cloud Infrastructure (O
 
 * **Localização:** `oci-pipeline/terraform/`
 * **Controle de VMs:** `OCI_VM-Control/CONTROLE_OCI.bat`
-* **Documentação:** Veja [OCI_ACCESS_INFO.md](docs/OCI_VM-Control/README.md) e [OCI_NETWORK_DOCS.md](docs/OCI_NETWORK_DOCS.md)
+* **Documentação:** Veja [OCI_ACCESS_INFO.md](OCI_VM-Control/README.md) e [OCI_NETWORK_DOCS.md](docs/OCI_NETWORK_DOCS.md)
 
 ---
 
