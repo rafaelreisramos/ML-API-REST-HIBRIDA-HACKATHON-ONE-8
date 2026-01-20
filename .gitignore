@@ -99,3 +99,6 @@ OCI_ACCESS_INFO.md
 # Sensitive Configuration
 config.bat
 OCI_VM-Control/config.bat
+
+# Documentation Links (Local Only)
+README_LINK.md
