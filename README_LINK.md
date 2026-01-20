@@ -14,7 +14,7 @@
 
 O motor de IA desta plataforma foi construído com base em análise rigorosa de **30.000 registros**. O time de Data Science produziu um relatório completo com insights de negócio e o modelo preditivo final.
 
-📄 **[Acesse o Relatório Completo de Data Science](./DATASCIENCE/README_DS.md)**
+📄 **[Acesse o Relatório Completo de Data Science](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/DATASCIENCE/README_DS.md)**
 
 **Principais Métricas do Modelo:**
 
@@ -42,29 +42,29 @@ Abaixo você encontra o mapa completo de documentação técnica e funcional do 
 
 ### 📖 Guia do Usuário e API
 
-* [📘 **Manual de Uso**](./docs/MANUAL_DE_USO.md): Guia para o usuário final e navegação no Dashboard.
-* [📡 **Documentação da API**](./docs/API_DOCUMENTATION.md): Detalhes de Endpoints, Schemas GraphQL e Exemplos.
-* [🛠️ **Manual de Erros**](./docs/MANUAL_DE_ERROS.md): Guia de Troubleshooting e resolução de problemas comuns.
+* [📘 **Manual de Uso**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/MANUAL_DE_USO.md): Guia para o usuário final e navegação no Dashboard.
+* [📡 **Documentação da API**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/API_DOCUMENTATION.md): Detalhes de Endpoints, Schemas GraphQL e Exemplos.
+* [🛠️ **Manual de Erros**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/MANUAL_DE_ERROS.md): Guia de Troubleshooting e resolução de problemas comuns.
 
 ### 🏗️ Arquitetura e Decisões Técnicas
 
-* [🏛️ **Decisões de Arquitetura**](./docs/DECISOES_ARQUITETURA.md): Justificativas para a escolha da stack e padrões.
-* [📐 **Arquitetura do Sistema**](./docs/ARCHITECTURE.md): Detalhes sobre o padrão *Double-Write* e persistência.
-* [🔄 **Workflow Visual E2E**](./docs/PROJECT_ARCHITECTURE_WORKFLOW.md): Diagramas de sequência e fluxos de dados completos.
+* [🏛️ **Decisões de Arquitetura**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/DECISOES_ARQUITETURA.md): Justificativas para a escolha da stack e padrões.
+* [📐 **Arquitetura do Sistema**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/ARCHITECTURE.md): Detalhes sobre o padrão *Double-Write* e persistência.
+* [🔄 **Workflow Visual E2E**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/PROJECT_ARCHITECTURE_WORKFLOW.md): Diagramas de sequência e fluxos de dados completos.
 
 ### ☁️ Infraestrutura e Cloud (OCI)
 
-* [🌐 **Guia de Rede OCI**](./docs/OCI_NETWORK_DOCS.md): Detalhes de VCN, Subnets e Security Lists.
-* [🔑 **Informações de Acesso**](./docs/OCI_ACCESS_INFO.md): Credenciais e IPs da infraestrutura na nuvem.
-* [🚀 **Pipeline OCI**](./oci-pipeline/README.md): Instruções sobre o provisionamento via Terraform.
+* [🌐 **Guia de Rede OCI**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/OCI_NETWORK_DOCS.md): Detalhes de VCN, Subnets e Security Lists.
+* [🔑 **Informações de Acesso**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/OCI_ACCESS_INFO.md): Credenciais e IPs da infraestrutura na nuvem.
+* [🚀 **Pipeline OCI**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/oci-pipeline/README.md): Instruções sobre o provisionamento via Terraform.
 
 ### 🛡️ Segurança e Operações
 
-* [🔐 **Guia de Segurança**](./docs/SECURITY_GUIDE.md): Práticas de proteção de dados e autenticação JWT.
-* [🌐 **Configuração HTTPS**](./docs/HTTPS_CONFIGURATION.md): Detalhes sobre SSL/TLS e Traefik.
-* [🧪 **Evidências de Teste HTTPS**](./docs/TESTE_HTTPS.md): Relatório de validação da camada segura.
-* [📜 **Changelog**](./docs/CHANGELOG.md): Histórico de versões e melhorias.
-* [📊 **Relatório de Status**](./docs/RELATORIO_STATUS.md): Estado atual da entrega e funcionalidades.
+* [🔐 **Guia de Segurança**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/SECURITY_GUIDE.md): Práticas de proteção de dados e autenticação JWT.
+* [🌐 **Configuração HTTPS**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/HTTPS_CONFIGURATION.md): Detalhes sobre SSL/TLS e Traefik.
+* [🧪 **Evidências de Teste HTTPS**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/TESTE_HTTPS.md): Relatório de validação da camada segura.
+* [📜 **Changelog**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/CHANGELOG.md): Histórico de versões e melhorias.
+* [📊 **Relatório de Status**](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/RELATORIO_STATUS.md): Estado atual da entrega e funcionalidades.
 
 ---
 
@@ -133,7 +133,7 @@ O projeto inclui scripts Terraform para deploy na Oracle Cloud Infrastructure (O
 
 * **Localização:** `oci-pipeline/terraform/`
 * **Controle de VMs:** `OCI_VM-Control/CONTROLE_OCI.bat`
-* **Documentação:** Veja [OCI_ACCESS_INFO.md](docs/OCI_ACCESS_INFO.md) e [OCI_NETWORK_DOCS.md](docs/OCI_NETWORK_DOCS.md)
+* **Documentação:** Veja [OCI_ACCESS_INFO.md](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/OCI_ACCESS_INFO.md) e [OCI_NETWORK_DOCS.md](https://github.com/Araken13/ML-API-REST-HIBRIDA-HACKATHON-ONE-8/blob/main/docs/OCI_NETWORK_DOCS.md)
 
 ---
 
