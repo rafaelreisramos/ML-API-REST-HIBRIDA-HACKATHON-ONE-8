@@ -38,6 +38,7 @@ frontend/.env.local
 # AI Models (GRANDE - não versionar no Git)
 *.joblib
 !ai_service/models/modelo_churn.joblib
+!ai_service/models/rfe_selector.joblib
 !hackathon_g8_one/models/modelo_churn.joblib
 !hackathon_g8_one/models/rfe_selector.joblib
 *.pkl

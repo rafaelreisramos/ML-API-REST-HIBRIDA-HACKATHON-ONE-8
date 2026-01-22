@@ -1,0 +1,11 @@
+clienteId,idade,genero,regiao,valorMensal,tempoAssinaturaMeses,planoAssinatura,metodoPagamento,dispositivoPrincipal,visualizacoesMes,contatosSuporte,avaliacaoPlataforma,avaliacaoConteudoMedia,avaliacaoConteudoUltimoMes,tempoMedioSessaoMin,diasUltimoAcesso,tipoContrato,categoriaFavorita,acessibilidade
+NPS-LOW-01,28,Masculino,Sudeste,49.90,8,basico,boleto,mobile,8,4,2.5,2.8,2.0,20,15,MENSAL,SÉRIES,0
+NPS-LOW-02,35,Feminino,Sul,39.90,5,basico,pix,mobile,5,5,2.0,2.5,1.5,15,20,MENSAL,FILMES,0
+NPS-LOW-03,42,Masculino,Nordeste,59.90,10,padrao,credito,desktop,12,3,3.5,3.0,3.0,30,10,MENSAL,ESPORTES,0
+NPS-LOW-04,31,Feminino,Norte,29.90,4,basico,boleto,mobile,6,6,3.0,2.5,2.8,18,18,MENSAL,DOCUMENTÁRIOS,0
+NPS-LOW-05,45,Masculino,Centro-Oeste,69.90,15,padrao,credito,tv,15,2,4.5,4.0,4.2,45,5,ANUAL,FILMES,1
+NPS-LOW-06,26,Feminino,Sudeste,39.90,6,basico,pix,mobile,7,4,3.5,3.2,3.0,22,12,MENSAL,SÉRIES,0
+NPS-LOW-07,38,Masculino,Sul,49.90,9,padrao,credito,desktop,10,5,4.0,3.5,3.8,28,8,MENSAL,ESPORTES,0
+NPS-LOW-08,52,Feminino,Nordeste,59.90,12,padrao,boleto,tv,14,3,4.5,4.0,4.0,40,6,ANUAL,DOCUMENTÁRIOS,0
+NPS-LOW-09,29,Masculino,Norte,34.90,3,basico,pix,mobile,4,7,2.5,2.0,2.2,12,22,MENSAL,FILMES,0
+NPS-LOW-10,33,Feminino,Centro-Oeste,44.90,7,basico,credito,mobile,9,4,3.5,3.0,3.5,25,14,MENSAL,SÉRIES,0

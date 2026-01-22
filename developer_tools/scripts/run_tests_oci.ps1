@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$env:PYTHONIOENCODING = "utf-8"
 $OCI_URL = "http://137.131.179.58:9999"
 
 Write-Host "Executando Testes E2E contra OCI - ($OCI_URL)" -ForegroundColor Cyan
@@ -35,11 +36,13 @@ foreach ($test in $tests) {
         if (Test-Path $test) {
             python $test
             if ($LASTEXITCODE -eq 0) { $passed++ } else { $failed++ }
-        } else {
+        }
+        else {
             Write-Host "Script nao encontrado: $test" -ForegroundColor Red
             $failed++
         }
-    } catch {
+    }
+    catch {
         Write-Host "Erro ao executar $test" -ForegroundColor Red
         $failed++
     }
@@ -49,6 +52,7 @@ Write-Host "`n============================================================" -For
 Write-Host "Total: $($tests.Count) | Passou: $passed | Falhou: $failed" -ForegroundColor White
 if ($failed -eq 0) {
     Write-Host "SUCESSO TOTAL! OCI ESTÁ PRONTA!" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "ALERTA: Alguns testes falharam." -ForegroundColor Red
 }
