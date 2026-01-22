@@ -6,8 +6,8 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-    // Pega o token do storage
-    const token = localStorage.getItem('token');
+    // Pega o token do storage (mesma chave que AuthContext)
+    const token = localStorage.getItem('auth_token');
     // Retorna os headers com o token se existir
     return {
         headers: {
