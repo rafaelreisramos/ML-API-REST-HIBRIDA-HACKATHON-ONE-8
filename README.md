@@ -46,6 +46,11 @@ Abaixo você encontra o mapa completo de documentação técnica e funcional do 
 * [📡 **Documentação da API**](./docs/API_DOCUMENTATION.md): Detalhes de Endpoints, Schemas GraphQL e Exemplos.
 * [🛠️ **Manual de Erros**](./docs/MANUAL_DE_ERROS.md): Guia de Troubleshooting e resolução de problemas comuns.
 
+### 🎤 Materiais de Apresentação
+
+* [📄 **Slides do MVP (PDF)**](./docs/apresentacao-mvp.pdf): Apresentação executiva do projeto.
+* [📝 **Roteiro de Apresentação**](./docs/STORY-APRESENTACAO.md): Storytelling e fluxo da demonstração.
+
 ### 🏗️ Arquitetura e Decisões Técnicas
 
 * [🏛️ **Decisões de Arquitetura**](./docs/DECISOES_ARQUITETURA.md): Justificativas para a escolha da stack e padrões.
