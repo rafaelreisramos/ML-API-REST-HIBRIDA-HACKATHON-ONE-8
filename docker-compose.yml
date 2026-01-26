@@ -1,6 +1,32 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  # --- Traefik (Reverse Proxy & SSL) ---
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory" # Descomentar para testes (evita rate limit)
+      - "--certificatesresolvers.myresolver.acme.email=admin@${DOMAIN}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080" # Dashboard (Insecure)
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - churn-network
+    restart: unless-stopped
+
   # --- Backend API (Java Spring Boot) ---
   backend:
     build:
@@ -12,12 +38,41 @@ services:
     environment:
       - ML_SERVICE_URL=http://ai-service:5000
       - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_TOOL_OPTIONS=-Djava.security.egd=file:/dev/./urandom
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=churndb_pg
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - LOGGING_LEVEL_ORG_APACHE_COYOTE_HTTP11=DEBUG
     depends_on:
       ai-service:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     networks:
       - churn-network
     restart: unless-stopped
+
+  # --- Banco de Dados Secundário (PostgreSQL) ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: churn-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=churndb_pg
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - churn-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- Python AI Service ---
   ai-service:
@@ -31,26 +86,38 @@ services:
       - churn-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import requests; requests.get(\"http://localhost:5000/docs\")' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          'python -c ''import requests; requests.get("http://localhost:5000/docs")'' || exit 1',
+        ]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
-      start_period: 10s
+      start_period: 60s
 
   # --- Frontend (React/Vite + Nginx) ---
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: frontend-ui
-    ports:
-      - "80:80" # Porta padrão HTTP
-      - "3000:80" # Alternativa se a 80 estiver ocupada
+    # Ports removed because Traefik handles ingress
     networks:
       - churn-network
     depends_on:
       - backend
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.frontend-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
 networks:
   churn-network:

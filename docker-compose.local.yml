@@ -1,0 +1,95 @@
+version: "3.8"
+
+services:
+  # --- Traefik (Opcional no Local, mas mantido para paridade) ---
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Dashboard acessível localmente
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - churn-network
+
+  # --- Backend API ---
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend-api
+    ports:
+      - "9999:9999"
+    environment:
+      - ML_SERVICE_URL=http://ai-service:5000
+      - SPRING_PROFILES_ACTIVE=dev # Perfil DEV
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=churndb_pg
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      ai-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - churn-network
+
+  # --- Banco de Dados ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: churn-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=churndb_pg
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - churn-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- Python AI Service ---
+  ai-service:
+    build:
+      context: .
+      dockerfile: ai_service/Dockerfile
+    container_name: ai-service
+    ports:
+      - "5000:5000"
+    networks:
+      - churn-network
+    healthcheck:
+      test: ["CMD-SHELL", 'python -c ''import requests; requests.get("http://localhost:5000/docs")'' || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # --- Frontend (Local Mode) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-ui
+    ports:
+      - "3000:80" # Porta exposta para acesso direto!
+    networks:
+      - churn-network
+    depends_on:
+      - backend
+
+networks:
+  churn-network:
+    driver: bridge

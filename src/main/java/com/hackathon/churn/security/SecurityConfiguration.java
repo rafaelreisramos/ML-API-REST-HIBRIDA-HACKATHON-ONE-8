@@ -23,15 +23,21 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(java.util.List.of("*"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    return corsConfiguration;
+                }))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/login").permitAll();
                     req.requestMatchers("/usuarios").permitAll();
+                    req.requestMatchers("/actuator/health").permitAll();
                     req.requestMatchers("/graphiql").permitAll();
-                    req.requestMatchers("/graphql").permitAll(); // Liberado no Spring Security, validado via
-                                                                 // Token/Contexto
+                    req.requestMatchers("/graphql").permitAll();
                     req.anyRequest().authenticated();
-
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

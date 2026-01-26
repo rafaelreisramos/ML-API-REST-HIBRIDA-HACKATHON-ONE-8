@@ -29,7 +29,7 @@ public class ChurnBatchOptimizedController {
     private ChurnBatchService churnBatchService;
 
     @PostMapping("/batch/optimized")
-    @Operation(summary = "Processamento em Lote OTIMIZADO", description = "Processa CSV com threading paralelo (20x mais rápido) + bulk insert MongoDB")
+    @Operation(summary = "Processamento em Lote OTIMIZADO", description = "Processa CSV com threading paralelo (20x mais rápido) + bulk insert BD")
     public ResponseEntity<byte[]> processarLoteOtimizado(@RequestParam("file") MultipartFile file) throws IOException {
 
         if (file.isEmpty()) {

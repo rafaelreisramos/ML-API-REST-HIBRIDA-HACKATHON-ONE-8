@@ -164,6 +164,11 @@ resource "oci_core_instance" "app_server" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "${var.project_name}-app-server"
   shape               = var.instance_shape
+
+  shape_config {
+    ocpus         = var.app_ocpus
+    memory_in_gbs = var.app_memory
+  }
   
   create_vnic_details {
     subnet_id        = oci_core_subnet.public.id
@@ -192,6 +197,11 @@ resource "oci_core_instance" "ai_server" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "${var.project_name}-ai-server"
   shape               = var.instance_shape
+
+  shape_config {
+    ocpus         = var.ai_ocpus
+    memory_in_gbs = var.ai_memory
+  }
   
   create_vnic_details {
     subnet_id        = oci_core_subnet.public.id
@@ -222,7 +232,7 @@ resource "oci_core_volume" "app_data" {
   compartment_id      = var.compartment_ocid
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   display_name        = "${var.project_name}-app-data"
-  size_in_gbs         = 10 # Always Free: até 100GB total
+  size_in_gbs         = 50 # Mínimo permitido: 50GB. Free Tier total: 200GB
   
   freeform_tags = var.tags
 }

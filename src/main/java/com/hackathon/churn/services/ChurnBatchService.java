@@ -11,8 +11,10 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Service responsável pelo processamento em lote de análises de Churn.
@@ -27,9 +29,18 @@ public class ChurnBatchService {
     @Autowired
     private ChurnService churnService;
 
+    @Autowired
+    private com.hackathon.churn.Repository.secondary.ChurnRepositorySecondary repositorySecondary;
+
     // Configurações de paralelismo
     private static final int THREAD_POOL_SIZE = 20;
     private static final int BULK_INSERT_SIZE = 1000;
+
+    private ChurnData clonar(ChurnData origem) {
+        ChurnData copia = new ChurnData();
+        BeanUtils.copyProperties(origem, copia);
+        return copia;
+    }
 
     /**
      * Processa um lote de clientes a partir de um CSV (processamento sequencial).
@@ -42,8 +53,15 @@ public class ChurnBatchService {
             try {
                 ChurnData dados = mapearParaChurnData(linha);
                 ChurnData resultado = churnService.chamarServicoIA(dados);
-                repository.save(resultado);
-                resultados.add(resultado);
+                ChurnData salvo = repository.save(resultado);
+
+                // Double-write secundário
+                try {
+                    repositorySecondary.save(clonar(salvo));
+                } catch (Exception ignored) {
+                }
+
+                resultados.add(salvo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -95,13 +113,22 @@ public class ChurnBatchService {
      * Salva resultados em lotes para melhor performance.
      */
     private void salvarEmLote(List<ChurnData> resultados, int totalClientes) {
-        System.out.println("💾 Salvando " + resultados.size() + " resultados no MongoDB (bulk insert)...");
+        System.out.println("💾 Salvando " + resultados.size() + " resultados no Banco de Dados (bulk insert)...");
         int saved = 0;
 
         for (int i = 0; i < resultados.size(); i += BULK_INSERT_SIZE) {
             int end = Math.min(i + BULK_INSERT_SIZE, resultados.size());
             List<ChurnData> batch = resultados.subList(i, end);
             repository.saveAll(batch);
+
+            // Double-write secundário (Batch)
+            try {
+                List<ChurnData> copias = batch.stream().map(this::clonar).collect(Collectors.toList());
+                repositorySecondary.saveAll(copias);
+            } catch (Exception e) {
+                System.err.println("Erro batch secundário: " + e.getMessage());
+            }
+
             saved += batch.size();
             System.out.println("  ✅ Salvos: " + saved + "/" + totalClientes);
         }

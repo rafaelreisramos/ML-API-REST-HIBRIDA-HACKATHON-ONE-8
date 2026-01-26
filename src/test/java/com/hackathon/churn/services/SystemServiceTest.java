@@ -68,8 +68,8 @@ class SystemServiceTest {
     }
 
     @Test
-    @DisplayName("Health check MongoDB deve mostrar total de documentos")
-    void healthCheckMongoDBDeveMostrarTotalDocumentos() {
+    @DisplayName("Health check Database deve mostrar total de documentos")
+    void healthCheckDatabaseDeveMostrarTotalDocumentos() {
         // Arrange
         when(repository.count()).thenReturn(500L);
 
@@ -78,10 +78,10 @@ class SystemServiceTest {
 
         // Assert
         @SuppressWarnings("unchecked")
-        Map<String, Object> mongodb = (Map<String, Object>) resultado.get("mongodb");
-        assertNotNull(mongodb);
-        assertEquals("UP", mongodb.get("status"));
-        assertEquals(500L, mongodb.get("totalDocuments"));
+        Map<String, Object> db = (Map<String, Object>) resultado.get("database");
+        assertNotNull(db);
+        assertEquals("UP", db.get("status"));
+        assertEquals(500L, db.get("totalDocuments"));
     }
 
     @Test

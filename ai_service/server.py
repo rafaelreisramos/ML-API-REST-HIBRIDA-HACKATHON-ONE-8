@@ -175,7 +175,7 @@ def predict(input_data: JavaInput):
         return {
             "previsao": "Vai cancelar" if int(prediction) == 1 else "Vai continuar",
             "probabilidade": round(probabilidade, 4),
-            "riscoAlto": bool(probabilidade > 0.6), # Regra de negócio extra
+            "riscoAlto": bool(probabilidade > threshold_otimo), # Sincronizado com a decisão do modelo
             "modeloUsado": f"RandomForest G8 (Threshold: {threshold_otimo})"
         }
         

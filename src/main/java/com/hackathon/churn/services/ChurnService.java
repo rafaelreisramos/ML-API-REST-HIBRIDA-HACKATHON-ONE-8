@@ -9,22 +9,34 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.BeanUtils;
+import java.util.stream.Collectors;
 
 /**
  * Service responsável pela lógica de negócio de análises de Churn.
  * Centraliza operações de CRUD e integração com o serviço de IA.
  */
 @Service
+
 public class ChurnService {
 
     @Autowired
     private ChurnRepository repository;
 
     @Autowired
+    private com.hackathon.churn.Repository.secondary.ChurnRepositorySecondary repositorySecondary;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     @Value("${ml.service.url:http://localhost:5000}")
     private String mlServiceUrl;
+
+    private ChurnData clonar(ChurnData origem) {
+        ChurnData copia = new ChurnData();
+        BeanUtils.copyProperties(origem, copia);
+        return copia;
+    }
 
     /**
      * Lista todas as análises ativas.
@@ -59,7 +71,16 @@ public class ChurnService {
         ChurnData resultado = chamarServicoIA(input);
 
         // Salvar no banco
-        return repository.save(resultado);
+        ChurnData salvo = repository.save(resultado);
+
+        // Espelhamento para banco secundário (Fail-safe)
+        try {
+            repositorySecondary.save(clonar(salvo));
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar no banco secundário: " + e.getMessage());
+        }
+
+        return salvo;
     }
 
     /**
@@ -94,13 +115,28 @@ public class ChurnService {
      * Salva uma análise no banco de dados.
      */
     public ChurnData salvar(ChurnData dados) {
-        return repository.save(dados);
+        ChurnData salvo = repository.save(dados);
+        try {
+            repositorySecondary.save(clonar(salvo));
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar no banco secundário (salvar): " + e.getMessage());
+        }
+        return salvo;
     }
 
     /**
      * Salva múltiplas análises em lote.
      */
     public List<ChurnData> salvarTodos(List<ChurnData> dados) {
-        return repository.saveAll(dados);
+        List<ChurnData> salvos = repository.saveAll(dados);
+        try {
+            List<ChurnData> copias = salvos.stream()
+                    .map(this::clonar)
+                    .collect(Collectors.toList());
+            repositorySecondary.saveAll(copias);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar lote no banco secundário: " + e.getMessage());
+        }
+        return salvos;
     }
 }

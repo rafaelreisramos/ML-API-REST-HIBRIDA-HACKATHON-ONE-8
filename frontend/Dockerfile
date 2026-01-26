@@ -35,7 +35,7 @@ EXPOSE 80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1
 
 # Nginx roda como daemon off por padrão na imagem oficial
 CMD ["nginx", "-g", "daemon off;"]
